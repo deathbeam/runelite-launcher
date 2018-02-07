@@ -52,13 +52,21 @@ func main() {
 	distributionCache := path.Join(systemCache, distributionDirName)
 	log.Printf("System cache directory: %s", systemCache)
 
+	// Setup versions
+	distributionCacheVersionPath := path.Join(launcherCache, ".version-distribution")
+	distributionCacheVersion := ReadVersion(distributionCacheVersionPath)
+	clientCacheVersionPath := path.Join(launcherCache, ".version-client")
+	clientCacheVersion := ReadVersion(clientCacheVersionPath)
+
 	// TODO: Try to download distribution if not already downloaded
 	distributionArchiveDestination := path.Join(launcherCache, distributionArchiveName)
 
 	// Try to extract distribution if not already extracted
-	if !FileExists(systemCache) {
+	if !FileExists(systemCache) || !CompareVersion(distributionCacheVersion, distributionArtifactVersion) {
+		os.RemoveAll(systemCache)
 		os.MkdirAll(systemCache, os.ModePerm)
 		ExtractFile(distributionArchiveDestination, systemCache)
+		SaveVersion(distributionCacheVersionPath, distributionArtifactVersion)
 	}
 
 	// Try to download shaded jar if not already present
@@ -70,13 +78,15 @@ func main() {
 
 	distributionJarDestination := path.Join(distributionPath, distributionJarName)
 
-	if !FileExists(distributionJarDestination) {
+	if !FileExists(distributionJarDestination) || !CompareVersion(clientCacheVersion, clientArtifactVersion) {
 		baseUrl := "http://repo.runelite.net/"
 		groupPath := strings.Replace(bootstrap.Client.GroupId, ".", "/", -1)
 		shadedJarUrl := fmt.Sprintf("%s/%s/%s/%s/%s",
 			baseUrl, groupPath, clientArtifactName, clientArtifactVersion, clientJarName)
 
+		os.RemoveAll(distributionJarDestination)
 		DownloadFile(shadedJarUrl, distributionJarDestination)
+		SaveVersion(clientCacheVersionPath, clientArtifactVersion)
 	}
 
 	// Launch application

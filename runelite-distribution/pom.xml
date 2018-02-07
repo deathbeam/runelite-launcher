@@ -96,12 +96,10 @@
                 <executions>
                     <execution>
                         <id>create-distribution-linux32</id>
-
                         <phase>package</phase>
                         <goals>
                             <goal>java</goal>
                         </goals>
-
                         <configuration>
                             <includeProjectDependencies>false</includeProjectDependencies>
                             <includePluginDependencies>true</includePluginDependencies>
@@ -109,7 +107,6 @@
                                 <groupId>com.github.libgdx</groupId>
                                 <artifactId>packr</artifactId>
                             </executableDependency>
-
                             <mainClass>com.badlogicgames.packr.Packr</mainClass>
                             <arguments>
                                 <argument>--minimizejre</argument>
@@ -131,12 +128,10 @@
                     </execution>
                     <execution>
                         <id>create-distribution-linux64</id>
-
                         <phase>package</phase>
                         <goals>
                             <goal>java</goal>
                         </goals>
-
                         <configuration>
                             <includeProjectDependencies>false</includeProjectDependencies>
                             <includePluginDependencies>true</includePluginDependencies>
@@ -144,7 +139,6 @@
                                 <groupId>com.github.libgdx</groupId>
                                 <artifactId>packr</artifactId>
                             </executableDependency>
-
                             <mainClass>com.badlogicgames.packr.Packr</mainClass>
                             <arguments>
                                 <argument>--minimizejre</argument>
@@ -166,12 +160,10 @@
                     </execution>
                     <execution>
                         <id>create-distribution-windows32</id>
-
                         <phase>package</phase>
                         <goals>
                             <goal>java</goal>
                         </goals>
-
                         <configuration>
                             <includeProjectDependencies>false</includeProjectDependencies>
                             <includePluginDependencies>true</includePluginDependencies>
@@ -179,7 +171,6 @@
                                 <groupId>com.github.libgdx</groupId>
                                 <artifactId>packr</artifactId>
                             </executableDependency>
-
                             <mainClass>com.badlogicgames.packr.Packr</mainClass>
                             <arguments>
                                 <argument>--minimizejre</argument>
@@ -201,12 +192,10 @@
                     </execution>
                     <execution>
                         <id>create-distribution-windows64</id>
-
                         <phase>package</phase>
                         <goals>
                             <goal>java</goal>
                         </goals>
-
                         <configuration>
                             <includeProjectDependencies>false</includeProjectDependencies>
                             <includePluginDependencies>true</includePluginDependencies>
@@ -214,7 +203,6 @@
                                 <groupId>com.github.libgdx</groupId>
                                 <artifactId>packr</artifactId>
                             </executableDependency>
-
                             <mainClass>com.badlogicgames.packr.Packr</mainClass>
                             <arguments>
                                 <argument>--minimizejre</argument>
@@ -236,12 +224,10 @@
                     </execution>
                     <execution>
                         <id>create-distribution-darwin</id>
-
                         <phase>package</phase>
                         <goals>
                             <goal>java</goal>
                         </goals>
-
                         <configuration>
                             <includeProjectDependencies>false</includeProjectDependencies>
                             <includePluginDependencies>true</includePluginDependencies>
@@ -249,7 +235,6 @@
                                 <groupId>com.github.libgdx</groupId>
                                 <artifactId>packr</artifactId>
                             </executableDependency>
-
                             <mainClass>com.badlogicgames.packr.Packr</mainClass>
                             <arguments>
                                 <argument>--minimizejre</argument>
