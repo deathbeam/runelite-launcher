@@ -92,5 +92,12 @@ func main() {
 
 	log.Printf("Launching %s\n", distributionNativePath)
 	cmd := exec.Command(distributionNativePath)
-	cmd.Run()
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	err := cmd.Run()
+
+	if err != nil {
+		panic(err)
+	}
 }
