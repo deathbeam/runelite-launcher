@@ -3,19 +3,28 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"github.com/mitchellh/go-homedir"
 	"github.com/verybluebot/tarinator-go"
 	"io"
 	"log"
 	"net/http"
 	"os"
-	"os/exec"
-	"path"
 	"strconv"
 	"time"
 )
 
-func fileExists(name string) bool {
+func FetchFile(url string) []byte {
+	resp, err := http.Get(url)
+	if err != nil {
+		panic(err)
+	}
+
+	defer resp.Body.Close()
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(resp.Body)
+	return buf.Bytes()
+}
+
+func FileExists(name string) bool {
 	_, err := os.Stat(name)
 	return !os.IsNotExist(err)
 }
@@ -51,7 +60,7 @@ func printDownloadPercent(done chan int64, path string, total int64) {
 			fmt.Println("%")
 		}
 
-		if stop == true {
+		if stop {
 			break
 		}
 
@@ -59,22 +68,15 @@ func printDownloadPercent(done chan int64, path string, total int64) {
 	}
 }
 
-func downloadFile(url string, dest string) {
-	file := path.Base(url)
-
-	log.Printf("Downloading file %s from %s\n", file, url)
-
-	var buffer bytes.Buffer
-	buffer.WriteString(dest)
-	buffer.WriteString("/")
-	buffer.WriteString(file)
+func DownloadFile(url string, dest string) {
+	log.Printf("Downloading %s to %s\n", url, dest)
 
 	start := time.Now()
 
-	out, err := os.Create(buffer.String())
+	out, err := os.Create(dest)
 
 	if err != nil {
-		fmt.Println(buffer.String())
+		fmt.Println(dest)
 		panic(err)
 	}
 
@@ -96,7 +98,7 @@ func downloadFile(url string, dest string) {
 
 	done := make(chan int64)
 
-	go printDownloadPercent(done, buffer.String(), int64(size))
+	go printDownloadPercent(done, dest, int64(size))
 
 	resp, err := http.Get(url)
 
@@ -118,7 +120,7 @@ func downloadFile(url string, dest string) {
 	log.Printf("Download completed in %s", elapsed)
 }
 
-func extractFile(file string, dest string) {
+func ExtractFile(file string, dest string) {
 	start := time.Now()
 	log.Printf("Extracting file %s to %s\n", file, dest)
 
@@ -130,30 +132,4 @@ func extractFile(file string, dest string) {
 
 	elapsed := time.Since(start)
 	log.Printf("Extracting completed in %s", elapsed)
-}
-
-func main() {
-	url := "https://sigterm.info/runelite-launcher.tar.gz"
-	home, _ := homedir.Dir()
-	runelite := path.Join(home, ".runelite")
-	downloaded := path.Join(runelite, "runelite-launcher.tar.gz")
-	cache := path.Join(runelite, "cache")
-	executable := path.Join(cache, "out", "RuneLite.jar")
-
-	if !fileExists(runelite) {
-		os.MkdirAll(runelite, os.ModePerm)
-	}
-
-	if !fileExists(downloaded) {
-		downloadFile(url, runelite)
-	}
-
-	if !fileExists(cache) {
-		os.MkdirAll(cache, os.ModePerm)
-		extractFile(downloaded, cache)
-	}
-
-	log.Printf("Launching %s\n", executable)
-	cmnd := exec.Command("java", "-jar", executable)
-	cmnd.Run()
 }

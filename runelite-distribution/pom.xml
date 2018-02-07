@@ -28,9 +28,44 @@
 
                 <executions>
                     <execution>
-                        <id>package-native-linux</id>
+                        <id>create-distribution-linux32</id>
 
-                        <phase>install</phase>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+
+                        <configuration>
+                            <includeProjectDependencies>false</includeProjectDependencies>
+                            <includePluginDependencies>true</includePluginDependencies>
+                            <executableDependency>
+                                <groupId>com.github.libgdx</groupId>
+                                <artifactId>packr</artifactId>
+                            </executableDependency>
+
+                            <mainClass>com.badlogicgames.packr.Packr</mainClass>
+                            <arguments>
+                                <argument>--minimizejre</argument>
+                                <argument>hard</argument>
+                                <argument>--platform</argument>
+                                <argument>linux32</argument>
+                                <argument>--jdk</argument>
+                                <argument>/usr/lib/jvm/java-8-openjdk</argument>
+                                <argument>--executable</argument>
+                                <argument>${project.artifactId}</argument>
+                                <argument>--classpath</argument>
+                                <argument>${project.build.directory}/${project.build.finalName}.jar</argument>
+                                <argument>--mainclass</argument>
+                                <argument>net.runelite.client.RuneLite</argument>
+                                <argument>--output</argument>
+                                <argument>${project.build.directory}/distribution/linux32</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>create-distribution-linux64</id>
+
+                        <phase>package</phase>
                         <goals>
                             <goal>java</goal>
                         </goals>
@@ -58,9 +93,136 @@
                                 <argument>--mainclass</argument>
                                 <argument>net.runelite.client.RuneLite</argument>
                                 <argument>--output</argument>
-                                <argument>${project.build.directory}/native/linux64</argument>
+                                <argument>${project.build.directory}/distribution/linux64</argument>
                             </arguments>
                         </configuration>
+                    </execution>
+                    <execution>
+                        <id>create-distribution-windows32</id>
+
+                        <phase>package</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+
+                        <configuration>
+                            <includeProjectDependencies>false</includeProjectDependencies>
+                            <includePluginDependencies>true</includePluginDependencies>
+                            <executableDependency>
+                                <groupId>com.github.libgdx</groupId>
+                                <artifactId>packr</artifactId>
+                            </executableDependency>
+
+                            <mainClass>com.badlogicgames.packr.Packr</mainClass>
+                            <arguments>
+                                <argument>--minimizejre</argument>
+                                <argument>hard</argument>
+                                <argument>--platform</argument>
+                                <argument>windows32</argument>
+                                <argument>--jdk</argument>
+                                <argument>/usr/lib/jvm/java-8-openjdk</argument>
+                                <argument>--executable</argument>
+                                <argument>${project.artifactId}</argument>
+                                <argument>--classpath</argument>
+                                <argument>${project.build.directory}/${project.build.finalName}.jar</argument>
+                                <argument>--mainclass</argument>
+                                <argument>net.runelite.client.RuneLite</argument>
+                                <argument>--output</argument>
+                                <argument>${project.build.directory}/distribution/windows32</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>create-distribution-windows64</id>
+
+                        <phase>package</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+
+                        <configuration>
+                            <includeProjectDependencies>false</includeProjectDependencies>
+                            <includePluginDependencies>true</includePluginDependencies>
+                            <executableDependency>
+                                <groupId>com.github.libgdx</groupId>
+                                <artifactId>packr</artifactId>
+                            </executableDependency>
+
+                            <mainClass>com.badlogicgames.packr.Packr</mainClass>
+                            <arguments>
+                                <argument>--minimizejre</argument>
+                                <argument>hard</argument>
+                                <argument>--platform</argument>
+                                <argument>windows64</argument>
+                                <argument>--jdk</argument>
+                                <argument>/usr/lib/jvm/java-8-openjdk</argument>
+                                <argument>--executable</argument>
+                                <argument>${project.artifactId}</argument>
+                                <argument>--classpath</argument>
+                                <argument>${project.build.directory}/${project.build.finalName}.jar</argument>
+                                <argument>--mainclass</argument>
+                                <argument>net.runelite.client.RuneLite</argument>
+                                <argument>--output</argument>
+                                <argument>${project.build.directory}/distribution/windows64</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>create-distribution-darwin</id>
+
+                        <phase>package</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+
+                        <configuration>
+                            <includeProjectDependencies>false</includeProjectDependencies>
+                            <includePluginDependencies>true</includePluginDependencies>
+                            <executableDependency>
+                                <groupId>com.github.libgdx</groupId>
+                                <artifactId>packr</artifactId>
+                            </executableDependency>
+
+                            <mainClass>com.badlogicgames.packr.Packr</mainClass>
+                            <arguments>
+                                <argument>--minimizejre</argument>
+                                <argument>hard</argument>
+                                <argument>--platform</argument>
+                                <argument>mac</argument>
+                                <argument>--jdk</argument>
+                                <argument>/usr/lib/jvm/java-8-openjdk</argument>
+                                <argument>--executable</argument>
+                                <argument>${project.artifactId}</argument>
+                                <argument>--classpath</argument>
+                                <argument>${project.build.directory}/${project.build.finalName}.jar</argument>
+                                <argument>--mainclass</argument>
+                                <argument>net.runelite.client.RuneLite</argument>
+                                <argument>--output</argument>
+                                <argument>${project.build.directory}/distribution/darwin</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/assembly/archive-distribution-linux32.xml</descriptor>
+                        <descriptor>src/assembly/archive-distribution-linux64.xml</descriptor>
+                        <descriptor>src/assembly/archive-distribution-windows32.xml</descriptor>
+                        <descriptor>src/assembly/archive-distribution-windows64.xml</descriptor>
+                        <descriptor>src/assembly/archive-distribution-darwin.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>archive-distribution</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
