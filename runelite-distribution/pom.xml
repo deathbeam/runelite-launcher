@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>launcher-parent</artifactId>
+        <groupId>net.runelite.launcher</groupId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>runelite-distribution</artifactId>
+    <packaging>jar</packaging>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.5.0</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.github.libgdx</groupId>
+                        <artifactId>packr</artifactId>
+                        <version>master-SNAPSHOT</version>
+                    </dependency>
+                </dependencies>
+
+                <executions>
+                    <execution>
+                        <id>package-native-linux</id>
+
+                        <phase>install</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+
+                        <configuration>
+                            <includeProjectDependencies>false</includeProjectDependencies>
+                            <includePluginDependencies>true</includePluginDependencies>
+                            <executableDependency>
+                                <groupId>com.github.libgdx</groupId>
+                                <artifactId>packr</artifactId>
+                            </executableDependency>
+
+                            <mainClass>com.badlogicgames.packr.Packr</mainClass>
+                            <arguments>
+                                <argument>--minimizejre</argument>
+                                <argument>hard</argument>
+                                <argument>--platform</argument>
+                                <argument>linux64</argument>
+                                <argument>--jdk</argument>
+                                <argument>/usr/lib/jvm/java-8-openjdk</argument>
+                                <argument>--executable</argument>
+                                <argument>${project.artifactId}</argument>
+                                <argument>--classpath</argument>
+                                <argument>${project.build.directory}/${project.build.finalName}.jar</argument>
+                                <argument>--mainclass</argument>
+                                <argument>net.runelite.client.RuneLite</argument>
+                                <argument>--output</argument>
+                                <argument>${project.build.directory}/native/linux64</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

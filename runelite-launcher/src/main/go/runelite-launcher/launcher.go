@@ -21,7 +21,7 @@ func fileExists(name string) bool {
 }
 
 func printDownloadPercent(done chan int64, path string, total int64) {
-	var stop bool = false
+	stop := false
 
 	for {
 		select {
@@ -45,13 +45,13 @@ func printDownloadPercent(done chan int64, path string, total int64) {
 				size = 1
 			}
 
-			var percent float64 = float64(size) / float64(total) * 100
+			var percent = float64(size) / float64(total) * 100
 
 			fmt.Printf("%.0f", percent)
 			fmt.Println("%")
 		}
 
-		if stop {
+		if stop == true {
 			break
 		}
 
@@ -64,17 +64,17 @@ func downloadFile(url string, dest string) {
 
 	log.Printf("Downloading file %s from %s\n", file, url)
 
-	var path bytes.Buffer
-	path.WriteString(dest)
-	path.WriteString("/")
-	path.WriteString(file)
+	var buffer bytes.Buffer
+	buffer.WriteString(dest)
+	buffer.WriteString("/")
+	buffer.WriteString(file)
 
 	start := time.Now()
 
-	out, err := os.Create(path.String())
+	out, err := os.Create(buffer.String())
 
 	if err != nil {
-		fmt.Println(path.String())
+		fmt.Println(buffer.String())
 		panic(err)
 	}
 
@@ -96,7 +96,7 @@ func downloadFile(url string, dest string) {
 
 	done := make(chan int64)
 
-	go printDownloadPercent(done, path.String(), int64(size))
+	go printDownloadPercent(done, buffer.String(), int64(size))
 
 	resp, err := http.Get(url)
 
