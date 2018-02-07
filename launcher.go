@@ -60,7 +60,6 @@ func printDownloadPercent(done chan int64, path string, total int64) {
 }
 
 func downloadFile(url string, dest string) {
-
 	file := path.Base(url)
 
 	log.Printf("Downloading file %s from %s\n", file, url)
@@ -123,7 +122,7 @@ func extractFile(file string, dest string) {
 	start := time.Now()
 	log.Printf("Extracting file %s to %s\n", file, dest)
 
-	err := tarinator.UnTarinate(file, dest)
+	err := tarinator.UnTarinate(dest, file)
 
 	if err != nil {
 		panic(err)
