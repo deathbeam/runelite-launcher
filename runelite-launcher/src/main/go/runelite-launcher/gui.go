@@ -45,7 +45,7 @@ var (
 	refresh func()
 )
 
-func CloseWindow() {
+func TerminateWindow() {
 	window.Terminate()
 	window = nil
 }
@@ -72,6 +72,15 @@ func AppLog(format string, a ...interface{}) {
 			refresh()
 		})
 	}
+}
+
+func WindowLoop() bool {
+	if window != nil {
+		window.Loop(true)
+		return true
+	}
+
+	return false
 }
 
 func CreateUI(boot func()) {
@@ -101,6 +110,4 @@ func CreateUI(boot func()) {
 
 		go boot()
 	})
-
-	window.Run()
 }

@@ -37,6 +37,7 @@
                                     <goVersion>${go.sdk.version}</goVersion>
                                     <targetOs>linux</targetOs>
                                     <targetArch>386</targetArch>
+                                    <resultName>${project.build.finalName}-linux32</resultName>
                                 </configuration>
                             </execution>
                             <execution>
@@ -48,6 +49,7 @@
                                     <goVersion>${go.sdk.version}</goVersion>
                                     <targetOs>linux</targetOs>
                                     <targetArch>amd64</targetArch>
+                                    <resultName>${project.build.finalName}-linux64</resultName>
                                 </configuration>
                             </execution>
                             <execution>
@@ -59,9 +61,11 @@
                                     <env>
                                         <CC>i686-w64-mingw32-gcc</CC>
                                     </env>
+                                    <ldFlags>-H windowsgui</ldFlags>
                                     <goVersion>${go.sdk.version}</goVersion>
                                     <targetOs>windows</targetOs>
                                     <targetArch>386</targetArch>
+                                    <resultName>${project.build.finalName}-windows32.exe</resultName>
                                 </configuration>
                             </execution>
                             <execution>
@@ -73,9 +77,11 @@
                                     <env>
                                         <CC>x86_64-w64-mingw32-gcc</CC>
                                     </env>
+                                    <ldFlags>-H windowsgui</ldFlags>
                                     <goVersion>${go.sdk.version}</goVersion>
                                     <targetOs>windows</targetOs>
                                     <targetArch>amd64</targetArch>
+                                    <resultName>${project.build.finalName}-windows64.exe</resultName>
                                 </configuration>
                             </execution>
                             <execution>
@@ -87,6 +93,7 @@
                                     <goVersion>${go.sdk.version}</goVersion>
                                     <targetOs>darwin</targetOs>
                                     <targetArch>amd64</targetArch>
+                                    <resultName>${project.build.finalName}-darwin</resultName>
                                 </configuration>
                             </execution>
                         </executions>

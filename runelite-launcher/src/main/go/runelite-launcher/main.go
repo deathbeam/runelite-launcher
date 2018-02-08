@@ -79,6 +79,10 @@ func boot() {
 	distributionCache := path.Join(systemCache, distributionDirName)
 	AppLog("System cache directory: %s", systemCache)
 
+	if !FileExists(systemCache) {
+		os.MkdirAll(systemCache, os.ModePerm)
+	}
+
 	// Setup versions
 	distributionCacheVersionPath := path.Join(launcherCache, ".version-distribution")
 	distributionCacheVersion := ReadVersion(distributionCacheVersionPath)
@@ -146,11 +150,15 @@ func boot() {
 
 	// Save application path
 	cmdPath = distributionNativePath
-	CloseWindow()
+	defer TerminateWindow()
 }
 
 func main() {
 	CreateUI(boot)
+
+	for ok := true; ok; ok = WindowLoop() {
+		// Window is running
+	}
 
 	AppLog("Launching %s\n", cmdPath)
 	cmd := exec.Command(cmdPath)

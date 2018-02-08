@@ -52,5 +52,5 @@ func SaveVersion(file string, version string) {
 		panic(err)
 	}
 
-	AppLog("Saving new new version %s to %s", version, file)
+	AppLog("Saving new version %s to %s", version, file)
 }
