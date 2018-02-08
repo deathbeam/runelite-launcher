@@ -12,6 +12,90 @@
     <artifactId>runelite-launcher</artifactId>
     <packaging>mvn-golang</packaging>
 
+    <profiles>
+        <profile>
+            <id>all</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.igormaznitsa</groupId>
+                        <artifactId>mvn-golang-wrapper</artifactId>
+                        <configuration>
+                            <goVersion>${go.sdk.version}</goVersion>
+                            <command/>
+                            <env>
+                                <CGO_ENABLED>1</CGO_ENABLED>
+                            </env>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>build-linux32</id>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                                <configuration>
+                                    <goVersion>${go.sdk.version}</goVersion>
+                                    <targetOs>linux</targetOs>
+                                    <targetArch>386</targetArch>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>build-linux64</id>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                                <configuration>
+                                    <goVersion>${go.sdk.version}</goVersion>
+                                    <targetOs>linux</targetOs>
+                                    <targetArch>amd64</targetArch>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>build-windows32</id>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                                <configuration>
+                                    <env>
+                                        <CC>i686-w64-mingw32-gcc</CC>
+                                    </env>
+                                    <goVersion>${go.sdk.version}</goVersion>
+                                    <targetOs>windows</targetOs>
+                                    <targetArch>386</targetArch>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>build-windows64</id>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                                <configuration>
+                                    <env>
+                                        <CC>x86_64-w64-mingw32-gcc</CC>
+                                    </env>
+                                    <goVersion>${go.sdk.version}</goVersion>
+                                    <targetOs>windows</targetOs>
+                                    <targetArch>amd64</targetArch>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>build-darwin</id>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                                <configuration>
+                                    <goVersion>${go.sdk.version}</goVersion>
+                                    <targetOs>darwin</targetOs>
+                                    <targetArch>amd64</targetArch>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
     <build>
         <defaultGoal>clean package</defaultGoal>
         <sourceDirectory>${basedir}/src/main/go/${project.artifactId}</sourceDirectory>
@@ -22,7 +106,7 @@
                 <version>6.1.2</version>
                 <executions>
                     <execution>
-                        <id>preprocessGoSources</id>
+                        <id>preprocess-go-sources</id>
                         <phase>validate</phase>
                         <goals>
                             <goal>preprocess</goal>
@@ -58,7 +142,7 @@
                             <packages>
                                 <package>github.com/mitchellh/go-homedir</package>
                                 <package>github.com/verybluebot/tarinator-go</package>
-                                <package>github.com/andlabs/ui</package>
+                                <package>github.com/zserge/webview</package>
                             </packages>
                         </configuration>
                     </execution>

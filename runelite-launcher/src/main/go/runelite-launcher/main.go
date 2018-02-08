@@ -26,7 +26,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/andlabs/ui"
 	"github.com/mitchellh/go-homedir"
 	"os"
 	"os/exec"
@@ -34,6 +33,8 @@ import (
 	"runtime"
 	"strings"
 )
+
+var cmdPath string
 
 func boot() {
 	// Build system name
@@ -143,26 +144,19 @@ func boot() {
 		distributionNativePath = path.Join(distributionNativePath, distributionArtifactName)
 	}
 
-	// Launch application
-	AppLog("Launching %s\n", distributionNativePath)
-	cmd := exec.Command(distributionNativePath)
+	// Save application path
+	cmdPath = distributionNativePath
+	CloseWindow()
+}
+
+func main() {
+	CreateUI(boot)
+
+	AppLog("Launching %s\n", cmdPath)
+	cmd := exec.Command(cmdPath)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
-	HideWindow()
-	err := cmd.Run()
-	CloseWindow()
-
-	if err != nil {
-		panic(err)
-	}
-}
-
-func main() {
-	err := ui.Main(BuildGui(boot))
-
-	if err != nil {
-		panic(err)
-	}
+	cmd.Start()
 }
