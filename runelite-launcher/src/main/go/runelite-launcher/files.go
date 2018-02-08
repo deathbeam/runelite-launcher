@@ -1,3 +1,27 @@
+/*
+ * Copyright (c) 2018, Tomas Slusny <slusnucky@gmail.com>
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package main
 
 import (
@@ -5,7 +29,6 @@ import (
 	"fmt"
 	"github.com/verybluebot/tarinator-go"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -29,7 +52,7 @@ func FileExists(name string) bool {
 	return !os.IsNotExist(err)
 }
 
-func printDownloadPercent(done chan int64, path string, total int64) {
+func printDownloadPercent(done chan int64, path string, total int64, callback func(progress float64)) {
 	stop := false
 
 	for {
@@ -40,12 +63,12 @@ func printDownloadPercent(done chan int64, path string, total int64) {
 
 			file, err := os.Open(path)
 			if err != nil {
-				log.Fatal(err)
+				panic(err)
 			}
 
 			fi, err := file.Stat()
 			if err != nil {
-				log.Fatal(err)
+				panic(err)
 			}
 
 			size := fi.Size()
@@ -55,9 +78,7 @@ func printDownloadPercent(done chan int64, path string, total int64) {
 			}
 
 			var percent = float64(size) / float64(total) * 100
-
-			fmt.Printf("%.0f", percent)
-			fmt.Println("%")
+			callback(percent)
 		}
 
 		if stop {
@@ -68,8 +89,8 @@ func printDownloadPercent(done chan int64, path string, total int64) {
 	}
 }
 
-func DownloadFile(url string, dest string) {
-	log.Printf("Downloading %s to %s\n", url, dest)
+func DownloadFile(url string, dest string, callback func(percent float64)) {
+	AppLog("Downloading %s to %s\n", url, dest)
 
 	start := time.Now()
 
@@ -98,7 +119,7 @@ func DownloadFile(url string, dest string) {
 
 	done := make(chan int64)
 
-	go printDownloadPercent(done, dest, int64(size))
+	go printDownloadPercent(done, dest, int64(size), callback)
 
 	resp, err := http.Get(url)
 
@@ -117,12 +138,12 @@ func DownloadFile(url string, dest string) {
 	done <- n
 
 	elapsed := time.Since(start)
-	log.Printf("Download completed in %s", elapsed)
+	AppLog("Download completed in %s", elapsed)
 }
 
 func ExtractFile(file string, dest string) {
 	start := time.Now()
-	log.Printf("Extracting file %s to %s\n", file, dest)
+	AppLog("Extracting file %s to %s\n", file, dest)
 
 	err := tarinator.UnTarinate(dest, file)
 
@@ -131,5 +152,5 @@ func ExtractFile(file string, dest string) {
 	}
 
 	elapsed := time.Since(start)
-	log.Printf("Extracting completed in %s", elapsed)
+	AppLog("Extracting completed in %s", elapsed)
 }

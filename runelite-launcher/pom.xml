@@ -18,11 +18,33 @@
         <plugins>
             <plugin>
                 <groupId>com.igormaznitsa</groupId>
+                <artifactId>jcp</artifactId>
+                <version>6.1.2</version>
+                <executions>
+                    <execution>
+                        <id>preprocessGoSources</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>preprocess</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <processing>go</processing>
+                    <excluded>txt,png</excluded>
+                    <keepLines>false</keepLines>
+                    <clear>true</clear>
+                    <destination>${project.build.directory}/generated-sources</destination>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.igormaznitsa</groupId>
                 <artifactId>mvn-golang-wrapper</artifactId>
                 <version>${go.wrapper.plugin.version}</version>
                 <extensions>true</extensions>
                 <configuration>
                     <goVersion>${go.sdk.version}</goVersion>
+                    <sources>${project.build.directory}/generated-sources</sources>
                     <command/>
                 </configuration>
                 <executions>
@@ -36,6 +58,7 @@
                             <packages>
                                 <package>github.com/mitchellh/go-homedir</package>
                                 <package>github.com/verybluebot/tarinator-go</package>
+                                <package>github.com/andlabs/ui</package>
                             </packages>
                         </configuration>
                     </execution>
