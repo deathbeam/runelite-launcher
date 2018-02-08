@@ -52,11 +52,13 @@ func boot() {
 	bootstrap := ReadBootstrap("http://static.runelite.net/bootstrap.json")
 	clientArtifactName := bootstrap.Client.ArtifactId
 	clientArtifactVersion := bootstrap.Client.Version
+	clientArtifactGroupId := bootstrap.Client.GroupId
 	clientJarName := fmt.Sprintf("%s-%s-shaded.jar", clientArtifactName, clientArtifactVersion)
 
 	// TODO: Parse distribution properties from somewhere
 	distributionArtifactName := "runelite-distribution"
-	distributionArtifactVersion := "1.0.0-SNAPSHOT"
+	distributionArtifactVersion := "1.0.0"
+	distributionArtifactGroupId := "/*$mvn.project.groupId$*/"
 	distributionDirName := fmt.Sprintf("%s-%s",
 		distributionArtifactName,
 		distributionArtifactVersion)
@@ -82,8 +84,21 @@ func boot() {
 	clientCacheVersionPath := path.Join(launcherCache, ".version-client")
 	clientCacheVersion := ReadVersion(clientCacheVersionPath)
 
-	// TODO: Try to download distribution if not already downloaded
+	// Try to download distribution if not already downloaded
 	distributionArchiveDestination := path.Join(launcherCache, distributionArchiveName)
+
+	if !FileExists(distributionArchiveDestination) || !CompareVersion(distributionCacheVersion, distributionArtifactVersion) {
+		baseUrl := "https://github.com/deathbeam/runelite-launcher/raw/mvn-repo"
+		groupPath := strings.Replace(distributionArtifactGroupId, ".", "/", -1)
+		archiveUrl := fmt.Sprintf("%s/%s/%s/%s/%s",
+			baseUrl, groupPath, distributionArtifactName, distributionArtifactVersion, distributionArchiveName)
+
+		os.RemoveAll(archiveUrl)
+
+		DownloadFile(archiveUrl, distributionArchiveDestination, func(percent float64) {
+			UpdateProgress(percent)
+		})
+	}
 
 	// Try to extract distribution if not already extracted
 	if !FileExists(systemCache) || !CompareVersion(distributionCacheVersion, distributionArtifactVersion) {
@@ -104,7 +119,7 @@ func boot() {
 
 	if !FileExists(distributionJarDestination) || !CompareVersion(clientCacheVersion, clientArtifactVersion) {
 		baseUrl := "http://repo.runelite.net/"
-		groupPath := strings.Replace(bootstrap.Client.GroupId, ".", "/", -1)
+		groupPath := strings.Replace(clientArtifactGroupId, ".", "/", -1)
 		shadedJarUrl := fmt.Sprintf("%s/%s/%s/%s/%s",
 			baseUrl, groupPath, clientArtifactName, clientArtifactVersion, clientJarName)
 
