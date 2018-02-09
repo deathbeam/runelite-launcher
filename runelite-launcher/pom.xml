@@ -23,9 +23,6 @@
                         <configuration>
                             <goVersion>${go.sdk.version}</goVersion>
                             <command/>
-                            <env>
-                                <CGO_ENABLED>1</CGO_ENABLED>
-                            </env>
                         </configuration>
                         <executions>
                             <execution>
@@ -34,10 +31,6 @@
                                     <goal>build</goal>
                                 </goals>
                                 <configuration>
-                                    <env>
-                                        <CC>i686-w64-mingw32-gcc</CC>
-                                    </env>
-                                    <ldFlags>-H windowsgui</ldFlags>
                                     <goVersion>${go.sdk.version}</goVersion>
                                     <targetOs>windows</targetOs>
                                     <targetArch>386</targetArch>
@@ -50,10 +43,6 @@
                                     <goal>build</goal>
                                 </goals>
                                 <configuration>
-                                    <env>
-                                        <CC>x86_64-w64-mingw32-gcc</CC>
-                                    </env>
-                                    <ldFlags>-H windowsgui</ldFlags>
                                     <goVersion>${go.sdk.version}</goVersion>
                                     <targetOs>windows</targetOs>
                                     <targetArch>amd64</targetArch>
@@ -66,9 +55,6 @@
                                     <goal>build</goal>
                                 </goals>
                                 <configuration>
-                                    <env>
-                                        <CC>x86_64-pc-linux-gnu-gcc</CC>
-                                    </env>
                                     <goVersion>${go.sdk.version}</goVersion>
                                     <targetOs>linux</targetOs>
                                     <targetArch>amd64</targetArch>
@@ -81,9 +67,6 @@
                                     <goal>build</goal>
                                 </goals>
                                 <configuration>
-                                    <env>
-                                        <CC>x86_64-pc-linux-gnu-gcc -m32</CC>
-                                    </env>
                                     <goVersion>${go.sdk.version}</goVersion>
                                     <targetOs>linux</targetOs>
                                     <targetArch>386</targetArch>
@@ -96,9 +79,6 @@
                                     <goal>build</goal>
                                 </goals>
                                 <configuration>
-                                    <env>
-                                        <CC>x86_46-apple-darwin15-cc</CC>
-                                    </env>
                                     <goVersion>${go.sdk.version}</goVersion>
                                     <targetOs>darwin</targetOs>
                                     <targetArch>amd64</targetArch>
@@ -158,7 +138,7 @@
                             <packages>
                                 <package>github.com/mitchellh/go-homedir</package>
                                 <package>github.com/verybluebot/tarinator-go</package>
-                                <package>github.com/zserge/webview</package>
+                                <package>github.com/gizak/termui</package>
                             </packages>
                         </configuration>
                     </execution>

@@ -50,7 +50,10 @@ func boot() {
 	}
 
 	// Parse bootstrap properties
-	bootstrap := ReadBootstrap("http://static.runelite.net/bootstrap.json")
+	boostrapPath := "http://static.runelite.net/bootstrap.json"
+	AppLog("[Downloading](fg-bold) [%s](fg-yellow) from [%s](fg-yellow)",
+		"bootstrap.json", LimitString(boostrapPath))
+	bootstrap := ReadBootstrap(boostrapPath)
 	clientArtifactName := bootstrap.Client.ArtifactId
 	clientArtifactVersion := bootstrap.Client.Version
 	clientArtifactGroupId := bootstrap.Client.GroupId
@@ -77,7 +80,7 @@ func boot() {
 	launcherCache := path.Join(runeliteHome, "cache")
 	systemCache := path.Join(launcherCache, systemName)
 	distributionCache := path.Join(systemCache, distributionDirName)
-	AppLog("System cache directory: %s", systemCache)
+	AppLog("[Found](fg-bold) system cache directory at [%s](fg-yellow)", LimitString(systemCache))
 
 	if !FileExists(systemCache) {
 		os.MkdirAll(systemCache, os.ModePerm)
@@ -103,6 +106,8 @@ func boot() {
 		DownloadFile(archiveUrl, distributionArchiveDestination, func(percent float64) {
 			UpdateProgress(percent)
 		})
+	} else {
+		AppLog("[Found](fg-bold) distribution archive at [%s](fg-yellow)", LimitString(distributionArchiveDestination))
 	}
 
 	// Try to extract distribution if not already extracted
@@ -111,6 +116,8 @@ func boot() {
 		os.MkdirAll(systemCache, os.ModePerm)
 		ExtractFile(distributionArchiveDestination, systemCache)
 		SaveVersion(distributionCacheVersionPath, distributionArtifactVersion)
+	} else {
+		AppLog("[Found](fg-bold) distribution at [%s](fg-yellow)", LimitString(systemCache))
 	}
 
 	// Try to download shaded jar if not already present
@@ -135,6 +142,8 @@ func boot() {
 		})
 
 		SaveVersion(clientCacheVersionPath, clientArtifactVersion)
+	} else {
+		AppLog("[Found](fg-bold) distribution jar at [%s](fg-yellow)", LimitString(distributionJarDestination))
 	}
 
 	// Build path to application executable
@@ -150,21 +159,14 @@ func boot() {
 
 	// Save application path
 	cmdPath = distributionNativePath
-	defer TerminateWindow()
 }
 
 func main() {
 	CreateUI(boot)
-
-	for ok := true; ok; ok = WindowLoop() {
-		// Window is running
-	}
-
 	AppLog("Launching %s\n", cmdPath)
 	cmd := exec.Command(cmdPath)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-
 	cmd.Start()
 }
