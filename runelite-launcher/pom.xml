@@ -34,6 +34,9 @@
                                     <goal>build</goal>
                                 </goals>
                                 <configuration>
+                                    <env>
+                                        <CC>x86_64-pc-linux-gnu-gcc</CC>
+                                    </env>
                                     <goVersion>${go.sdk.version}</goVersion>
                                     <targetOs>linux</targetOs>
                                     <targetArch>386</targetArch>
@@ -46,6 +49,9 @@
                                     <goal>build</goal>
                                 </goals>
                                 <configuration>
+                                    <env>
+                                        <CC>x86_64-pc-linux-gnu-gcc</CC>
+                                    </env>
                                     <goVersion>${go.sdk.version}</goVersion>
                                     <targetOs>linux</targetOs>
                                     <targetArch>amd64</targetArch>
