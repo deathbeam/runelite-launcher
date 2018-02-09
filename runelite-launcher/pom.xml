@@ -23,41 +23,18 @@
                         <configuration>
                             <goVersion>${go.sdk.version}</goVersion>
                             <command/>
-                            <env>
-                                <CGO_ENABLED>1</CGO_ENABLED>
-                            </env>
                         </configuration>
                         <executions>
                             <execution>
-                                <id>build-windows32</id>
+                                <id>get-rsrc</id>
                                 <goals>
-                                    <goal>build</goal>
+                                    <goal>get</goal>
                                 </goals>
                                 <configuration>
-                                    <env>
-                                        <CC>i686-w64-mingw32-gcc</CC>
-                                    </env>
-                                    <ldFlags>-H windowsgui</ldFlags>
                                     <goVersion>${go.sdk.version}</goVersion>
-                                    <targetOs>windows</targetOs>
-                                    <targetArch>386</targetArch>
-                                    <resultName>${project.build.finalName}-windows32.exe</resultName>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>build-windows64</id>
-                                <goals>
-                                    <goal>build</goal>
-                                </goals>
-                                <configuration>
-                                    <env>
-                                        <CC>x86_64-w64-mingw32-gcc</CC>
-                                    </env>
-                                    <ldFlags>-H windowsgui</ldFlags>
-                                    <goVersion>${go.sdk.version}</goVersion>
-                                    <targetOs>windows</targetOs>
-                                    <targetArch>amd64</targetArch>
-                                    <resultName>${project.build.finalName}-windows64.exe</resultName>
+                                    <packages>
+                                        <package>github.com/akavel/rsrc</package>
+                                    </packages>
                                 </configuration>
                             </execution>
                             <execution>
@@ -66,9 +43,6 @@
                                     <goal>build</goal>
                                 </goals>
                                 <configuration>
-                                    <env>
-                                        <CC>x86_64-pc-linux-gnu-gcc</CC>
-                                    </env>
                                     <goVersion>${go.sdk.version}</goVersion>
                                     <targetOs>linux</targetOs>
                                     <targetArch>amd64</targetArch>
@@ -81,9 +55,6 @@
                                     <goal>build</goal>
                                 </goals>
                                 <configuration>
-                                    <env>
-                                        <CC>x86_64-pc-linux-gnu-gcc -m32</CC>
-                                    </env>
                                     <goVersion>${go.sdk.version}</goVersion>
                                     <targetOs>linux</targetOs>
                                     <targetArch>386</targetArch>
@@ -96,13 +67,49 @@
                                     <goal>build</goal>
                                 </goals>
                                 <configuration>
-                                    <env>
-                                        <CC>x86_46-apple-darwin15-cc</CC>
-                                    </env>
                                     <goVersion>${go.sdk.version}</goVersion>
                                     <targetOs>darwin</targetOs>
                                     <targetArch>amd64</targetArch>
                                     <resultName>${project.build.finalName}-darwin</resultName>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>generate-windows-icon</id>
+                                <goals>
+                                    <goal>custom</goal>
+                                </goals>
+                                <configuration>
+                                    <goVersion>${go.sdk.version}</goVersion>
+                                    <exec>rsrc</exec>
+                                    <buildFlags>
+                                        <flag>-ico=${project.basedir}/src/main/resources/runelite.ico</flag>
+                                        <flag>-arch=386</flag>
+                                        <flag>-o=${project.build.directory}/generated-sources/icon.syso</flag>
+                                    </buildFlags>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>build-windows32</id>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                                <configuration>
+                                    <goVersion>${go.sdk.version}</goVersion>
+                                    <targetOs>windows</targetOs>
+                                    <targetArch>386</targetArch>
+                                    <resultName>${project.build.finalName}-windows32.exe</resultName>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>build-windows64</id>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                                <configuration>
+                                    <goVersion>${go.sdk.version}</goVersion>
+                                    <targetOs>windows</targetOs>
+                                    <targetArch>amd64</targetArch>
+                                    <resultName>${project.build.finalName}-windows64.exe</resultName>
                                 </configuration>
                             </execution>
                         </executions>
@@ -158,7 +165,7 @@
                             <packages>
                                 <package>github.com/mitchellh/go-homedir</package>
                                 <package>github.com/verybluebot/tarinator-go</package>
-                                <package>github.com/zserge/webview</package>
+                                <package>github.com/gizak/termui</package>
                             </packages>
                         </configuration>
                     </execution>

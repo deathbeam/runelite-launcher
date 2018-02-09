@@ -26,88 +26,71 @@ package main
 
 import (
 	"fmt"
-	"github.com/zserge/webview"
+	"github.com/gizak/termui"
 	"log"
+	"time"
 )
 
-type Controller struct {
-	Label string `json:"label"`
-	Progress int `json:"progress"`
-}
+const strLimit = 60
+var bar *termui.Gauge
+var open bool
 
-const windowTitle = "RuneLite Launcher /*$mvn.project.version$*/"
-const windowWidth  = 600
-const windowHeight  = 600
-
-var (
-	window webview.WebView
-	controller Controller
-	refresh func()
-)
-
-func TerminateWindow() {
-	window.Terminate()
-	window = nil
+func CloseUI()  {
+	open = false
+	time.Sleep(time.Second * 2)
+	termui.Close()
 }
 
 func UpdateProgress(value float64) {
-	window.Dispatch(func() {
-		controller.Progress = int(value)
-		refresh()
-	})
+	bar.Percent = int(value)
+
+	if !open {
+		log.Printf("Downloaded %s", value)
+		return
+	}
+
+	termui.Body.Align()
+	termui.Render(termui.Body)
+}
+
+func LimitString(str string) string {
+	if len(str) > strLimit {
+		return "..." + string(str[len(str)-strLimit:])
+	}
+
+	return str
 }
 
 func AppLog(format string, a ...interface{}) {
 	formatted := fmt.Sprintf(format, a...)
-	log.Print(formatted)
 
-	if window != nil {
-		window.Dispatch(func() {
-			if controller.Label == "" {
-				controller.Label = formatted
-			} else {
-				controller.Label += "\n" + formatted
-			}
-
-			refresh()
-		})
-	}
-}
-
-func WindowLoop() bool {
-	if window != nil {
-		window.Loop(true)
-		return true
+	if !open {
+		log.Printf(formatted)
+		return
 	}
 
-	return false
+	par := termui.NewPar(formatted)
+	par.Border = false
+	par.Height = 1
+
+	termui.Body.AddRows(termui.NewRow(termui.NewCol(12, 0, par)))
+	termui.Body.Align()
+	termui.Render(termui.Body)
 }
 
 func CreateUI(boot func()) {
-	controller = Controller{}
-	window = webview.New(webview.Settings{
-		Title: windowTitle,
-		Width: windowWidth,
-		Height: windowHeight,
-		Debug: true,
-	})
+	err := termui.Init()
+	open = true
 
-	window.Dispatch(func() {
-		// Bind controller
-		refresh, _ = window.Bind("controller", &controller)
+	if err != nil {
+		panic(err)
+	}
 
-		// Load bootstrap css
-		//#local bootstrap=str2java(evalfile("./../../resources/vendor/bootstrap.min.css"),false)
-		window.InjectCSS( "/*$bootstrap$*/")
-
-		// Load picodom library
-		//#local picodom=str2java(evalfile("./../../resources/vendor/picodom.min.js"),false)
-		window.Eval( "/*$picodom$*/")
-
-		// Load main application
-		//#local app=str2java(evalfile("./../../resources/app.js"),false)
-		window.Eval( "/*$app$*/")
-
-		go boot()
-	})
+	bar = termui.NewGauge()
+	bar.BarColor = termui.ColorCyan
+	termui.Body.AddRows(termui.NewRow(termui.NewCol(12, 0, bar)))
+	termui.Body.Align()
+	termui.Render(termui.Body)
+	boot()
+	CloseUI()
 }
