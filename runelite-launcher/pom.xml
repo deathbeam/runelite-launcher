@@ -29,36 +29,6 @@
                         </configuration>
                         <executions>
                             <execution>
-                                <id>build-linux32</id>
-                                <goals>
-                                    <goal>build</goal>
-                                </goals>
-                                <configuration>
-                                    <env>
-                                        <CC>x86_64-pc-linux-gnu-gcc</CC>
-                                    </env>
-                                    <goVersion>${go.sdk.version}</goVersion>
-                                    <targetOs>linux</targetOs>
-                                    <targetArch>386</targetArch>
-                                    <resultName>${project.build.finalName}-linux32</resultName>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>build-linux64</id>
-                                <goals>
-                                    <goal>build</goal>
-                                </goals>
-                                <configuration>
-                                    <env>
-                                        <CC>x86_64-pc-linux-gnu-gcc</CC>
-                                    </env>
-                                    <goVersion>${go.sdk.version}</goVersion>
-                                    <targetOs>linux</targetOs>
-                                    <targetArch>amd64</targetArch>
-                                    <resultName>${project.build.finalName}-linux64</resultName>
-                                </configuration>
-                            </execution>
-                            <execution>
                                 <id>build-windows32</id>
                                 <goals>
                                     <goal>build</goal>
@@ -91,11 +61,44 @@
                                 </configuration>
                             </execution>
                             <execution>
+                                <id>build-linux64</id>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                                <configuration>
+                                    <env>
+                                        <CC>x86_64-pc-linux-gnu-gcc</CC>
+                                    </env>
+                                    <goVersion>${go.sdk.version}</goVersion>
+                                    <targetOs>linux</targetOs>
+                                    <targetArch>amd64</targetArch>
+                                    <resultName>${project.build.finalName}-linux64</resultName>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>build-linux32</id>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                                <configuration>
+                                    <env>
+                                        <CC>x86_64-pc-linux-gnu-gcc -m32</CC>
+                                    </env>
+                                    <goVersion>${go.sdk.version}</goVersion>
+                                    <targetOs>linux</targetOs>
+                                    <targetArch>386</targetArch>
+                                    <resultName>${project.build.finalName}-linux32</resultName>
+                                </configuration>
+                            </execution>
+                            <execution>
                                 <id>build-darwin</id>
                                 <goals>
                                     <goal>build</goal>
                                 </goals>
                                 <configuration>
+                                    <env>
+                                        <CC>x86_46-apple-darwin15-cc</CC>
+                                    </env>
                                     <goVersion>${go.sdk.version}</goVersion>
                                     <targetOs>darwin</targetOs>
                                     <targetArch>amd64</targetArch>

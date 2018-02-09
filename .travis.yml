@@ -1,11 +1,10 @@
 os: osx
+compiler:
+  - gcc
 before_install:
- - brew install go --with-cc-all
- - brew install docker
- - brew install maven
- - docker pull karalabe/xgo-latest
- - go get github.com/karalabe/xgo
+ - brew install mingw-w64
+ - gcc --version
+ - i686-w64-mingw32-gcc --version
+ - x86_64-w64-mingw32-gcc --version
 script:
- - mvn clean install
- - cp -r runelite-launcher/src/generated-sources ~/.mvnGoLang/.go_path/src/runelite-launcher
- - cd ~/.mvnGoLang/.go_path/src/runelite-launcher && env GOPATH=~/.mvnGoLang/.go_path/ xgo --out target/cross --targets='windows/*,darwin/*,linux/*' ./
+ - mvn clean install -Pall -q

@@ -16,9 +16,9 @@ For cross-compilation of launcher, various libraries and compiler toolchains are
 * Gtk3 (both 32 and 64 bit/multilib)
 * Standard GNU GCC
 * MinGW64
+* osxcross (or being on osx)
 
-To cross-compile launcher (linux32, linux64, windows32, windows64, darwin), navigate to
-`runelite-launcher` and run
+To cross-compile (linux32, linux64, windows32, windows64, darwin), run
 
 ```
 mvn clean install -Pall
