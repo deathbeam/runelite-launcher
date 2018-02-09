@@ -26,27 +26,15 @@
                         </configuration>
                         <executions>
                             <execution>
-                                <id>build-windows32</id>
+                                <id>get-rsrc</id>
                                 <goals>
-                                    <goal>build</goal>
+                                    <goal>get</goal>
                                 </goals>
                                 <configuration>
                                     <goVersion>${go.sdk.version}</goVersion>
-                                    <targetOs>windows</targetOs>
-                                    <targetArch>386</targetArch>
-                                    <resultName>${project.build.finalName}-windows32.exe</resultName>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>build-windows64</id>
-                                <goals>
-                                    <goal>build</goal>
-                                </goals>
-                                <configuration>
-                                    <goVersion>${go.sdk.version}</goVersion>
-                                    <targetOs>windows</targetOs>
-                                    <targetArch>amd64</targetArch>
-                                    <resultName>${project.build.finalName}-windows64.exe</resultName>
+                                    <packages>
+                                        <package>github.com/akavel/rsrc</package>
+                                    </packages>
                                 </configuration>
                             </execution>
                             <execution>
@@ -83,6 +71,45 @@
                                     <targetOs>darwin</targetOs>
                                     <targetArch>amd64</targetArch>
                                     <resultName>${project.build.finalName}-darwin</resultName>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>generate-windows-icon</id>
+                                <goals>
+                                    <goal>custom</goal>
+                                </goals>
+                                <configuration>
+                                    <goVersion>${go.sdk.version}</goVersion>
+                                    <exec>rsrc</exec>
+                                    <buildFlags>
+                                        <flag>-ico=${project.basedir}/src/main/resources/runelite.ico</flag>
+                                        <flag>-arch=386</flag>
+                                        <flag>-o=${project.build.directory}/generated-sources/icon.syso</flag>
+                                    </buildFlags>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>build-windows32</id>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                                <configuration>
+                                    <goVersion>${go.sdk.version}</goVersion>
+                                    <targetOs>windows</targetOs>
+                                    <targetArch>386</targetArch>
+                                    <resultName>${project.build.finalName}-windows32.exe</resultName>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>build-windows64</id>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                                <configuration>
+                                    <goVersion>${go.sdk.version}</goVersion>
+                                    <targetOs>windows</targetOs>
+                                    <targetArch>amd64</targetArch>
+                                    <resultName>${project.build.finalName}-windows64.exe</resultName>
                                 </configuration>
                             </execution>
                         </executions>

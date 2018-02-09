@@ -50,10 +50,10 @@ func boot() {
 	}
 
 	// Parse bootstrap properties
-	boostrapPath := "http://static.runelite.net/bootstrap.json"
+	bootstrapPath := "http://static.runelite.net/bootstrap.json"
 	AppLog("[Downloading](fg-bold) [%s](fg-yellow) from [%s](fg-yellow)",
-		"bootstrap.json", LimitString(boostrapPath))
-	bootstrap := ReadBootstrap(boostrapPath)
+		path.Base(bootstrapPath), LimitString(bootstrapPath))
+	bootstrap := ReadBootstrap(bootstrapPath)
 	clientArtifactName := bootstrap.Client.ArtifactId
 	clientArtifactVersion := bootstrap.Client.Version
 	clientArtifactGroupId := bootstrap.Client.GroupId
