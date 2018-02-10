@@ -1,4 +1,4 @@
-//+build !gui
+// +build gui
 
 /*
  * Copyright (c) 2018, Tomas Slusny <slusnucky@gmail.com>
@@ -28,14 +28,20 @@ package main
 
 import (
 	"fmt"
-	"github.com/gizak/termui"
+	"github.com/aarzilli/nucular"
+	nstyle "github.com/aarzilli/nucular/style"
 	"log"
 	"time"
 )
 
 func CreateUI(boot func()) {
-	var bar *termui.Gauge
+	const title  = "/*$mvn.project.name$*/"
+	const theme = nstyle.DarkTheme
+	const scaling = 1
+
 	var open bool
+	var lines []string
+	var curProgress int
 
 	// Set global logger
 	logger = func (format string, a ...interface{}) {
@@ -46,47 +52,39 @@ func CreateUI(boot func()) {
 			return
 		}
 
-		par := termui.NewPar(formatted)
-		par.Border = false
-		par.Height = 1
-
-		termui.Body.AddRows(termui.NewRow(termui.NewCol(12, 0, par)))
-		termui.Body.Align()
-		termui.Render(termui.Body)
+		lines = append(lines, formatted)
 	}
+
 
 	// Set global progress indicator
 	progress = func (value int) {
-		bar.Percent = value
-
 		if !open {
 			log.Printf("Downloaded %s", value)
 			return
 		}
 
-		termui.Body.Align()
-		termui.Render(termui.Body)
+		curProgress = value
 	}
 
-	// Set global close function
+	window := nucular.NewMasterWindow(0, title, func(window *nucular.Window) {
+		window.Row(24).Dynamic(1)
+		window.Progress(&curProgress, 100, false)
+
+		for _, line := range lines  {
+			window.Row(24).Dynamic(1)
+			window.Label(line, "LT")
+		}
+	})
+
+	// Set global window closing function
 	closeWindow = func() {
-		// This does nothing here
+		time.Sleep(time.Second * 5)
+		window.Close()
 	}
 
-	err := termui.Init()
+	window.SetStyle(nstyle.FromTheme(theme, scaling))
+	go boot()
 	open = true
-
-	if err != nil {
-		panic(err)
-	}
-
-	bar = termui.NewGauge()
-	bar.BarColor = termui.ColorCyan
-	termui.Body.AddRows(termui.NewRow(termui.NewCol(12, 0, bar)))
-	termui.Body.Align()
-	termui.Render(termui.Body)
-	boot()
+	window.Main()
 	open = false
-	time.Sleep(time.Second * 2)
-	termui.Close()
 }

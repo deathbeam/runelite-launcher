@@ -24,8 +24,23 @@
                         <configuration>
                             <goVersion>${go.sdk.version}</goVersion>
                             <command/>
+                            <env>
+                                <CGO_ENABLED>1</CGO_ENABLED>
+                            </env>
                         </configuration>
                         <executions>
+                            <execution>
+                                <id>get-dependencies-gui</id>
+                                <goals>
+                                    <goal>get</goal>
+                                </goals>
+                                <configuration>
+                                    <goVersion>${go.sdk.version}</goVersion>
+                                    <packages>
+                                        <package>github.com/aarzilli/nucular</package>
+                                    </packages>
+                                </configuration>
+                            </execution>
                             <execution>
                                 <id>get-rsrc</id>
                                 <goals>
@@ -44,6 +59,12 @@
                                     <goal>build</goal>
                                 </goals>
                                 <configuration>
+                                    <env>
+                                        <CC>x86_64-pc-linux-gnu-gcc</CC>
+                                    </env>
+                                    <buildFlags>
+                                        <flag>-tags=gui</flag>
+                                    </buildFlags>
                                     <goVersion>${go.sdk.version}</goVersion>
                                     <targetOs>linux</targetOs>
                                     <targetArch>amd64</targetArch>
@@ -57,6 +78,12 @@
                                     <goal>build</goal>
                                 </goals>
                                 <configuration>
+                                    <env>
+                                        <CC>x86_64-pc-linux-gnu-gcc -m32</CC>
+                                    </env>
+                                    <buildFlags>
+                                        <flag>-tags=gui</flag>
+                                    </buildFlags>
                                     <goVersion>${go.sdk.version}</goVersion>
                                     <targetOs>linux</targetOs>
                                     <targetArch>386</targetArch>
@@ -70,6 +97,12 @@
                                     <goal>build</goal>
                                 </goals>
                                 <configuration>
+                                    <env>
+                                        <CC>x86_64-apple-darwin15-cc</CC>
+                                    </env>
+                                    <buildFlags>
+                                        <flag>-tags=gui</flag>
+                                    </buildFlags>
                                     <goVersion>${go.sdk.version}</goVersion>
                                     <targetOs>darwin</targetOs>
                                     <targetArch>amd64</targetArch>
@@ -98,6 +131,13 @@
                                     <goal>build</goal>
                                 </goals>
                                 <configuration>
+                                    <env>
+                                        <CC>x86_64-w64-mingw32-gcc</CC>
+                                    </env>
+                                    <buildFlags>
+                                        <flag>-tags=gui</flag>
+                                    </buildFlags>
+                                    <ldFlags>-H windowsgui</ldFlags>
                                     <goVersion>${go.sdk.version}</goVersion>
                                     <targetOs>windows</targetOs>
                                     <targetArch>386</targetArch>
@@ -111,6 +151,13 @@
                                     <goal>build</goal>
                                 </goals>
                                 <configuration>
+                                    <env>
+                                        <CC>i686-w64-mingw32-gcc</CC>
+                                    </env>
+                                    <buildFlags>
+                                        <flag>-tags=gui</flag>
+                                    </buildFlags>
+                                    <ldFlags>-H windowsgui</ldFlags>
                                     <goVersion>${go.sdk.version}</goVersion>
                                     <targetOs>windows</targetOs>
                                     <targetArch>amd64</targetArch>
@@ -215,6 +262,7 @@
                                 <package>github.com/mitchellh/go-homedir</package>
                                 <package>github.com/verybluebot/tarinator-go</package>
                                 <package>github.com/gizak/termui</package>
+                                <package>github.com/aarzilli/nucular</package>
                             </packages>
                         </configuration>
                     </execution>

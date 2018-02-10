@@ -41,7 +41,14 @@ var (
 )
 
 func main() {
-	var cmdPath string
+	run := func(path string) {
+		logger("Launching %s\n", path)
+		cmd := exec.Command(path)
+		cmd.Stdin = os.Stdin
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		cmd.Run()
+	}
 
 	boot := func() {
 		// Build system name
@@ -164,19 +171,9 @@ func main() {
 			distributionNativePath = path.Join(distributionNativePath, distributionArtifactName)
 		}
 
-		// Save application path
-		cmdPath = distributionNativePath
+		go run(distributionNativePath)
 		closeWindow()
 	}
 
-	CreateGUI(boot)
-
-	if cmdPath != "" {
-		logger("Launching %s\n", cmdPath)
-		cmd := exec.Command(cmdPath)
-		cmd.Stdin = os.Stdin
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		cmd.Start()
-	}
+	CreateUI(boot)
 }
