@@ -4,4 +4,4 @@ addons:
     packages:
       - maven
 script:
- - mvn clean install -Pall -q
+ - mvn clean install -Ptui -q
