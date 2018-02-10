@@ -10,6 +10,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>runelite-launcher</artifactId>
+    <name>RuneLite Launcher</name>
     <packaging>mvn-golang</packaging>
 
     <profiles>
@@ -46,7 +47,8 @@
                                     <goVersion>${go.sdk.version}</goVersion>
                                     <targetOs>linux</targetOs>
                                     <targetArch>amd64</targetArch>
-                                    <resultName>${project.build.finalName}-linux64</resultName>
+                                    <resultFolder>${project.build.directory}/distribution/linux64</resultFolder>
+                                    <resultName>${project.artifactId}</resultName>
                                 </configuration>
                             </execution>
                             <execution>
@@ -58,7 +60,8 @@
                                     <goVersion>${go.sdk.version}</goVersion>
                                     <targetOs>linux</targetOs>
                                     <targetArch>386</targetArch>
-                                    <resultName>${project.build.finalName}-linux32</resultName>
+                                    <resultFolder>${project.build.directory}/distribution/linux32</resultFolder>
+                                    <resultName>${project.artifactId}</resultName>
                                 </configuration>
                             </execution>
                             <execution>
@@ -70,7 +73,8 @@
                                     <goVersion>${go.sdk.version}</goVersion>
                                     <targetOs>darwin</targetOs>
                                     <targetArch>amd64</targetArch>
-                                    <resultName>${project.build.finalName}-darwin</resultName>
+                                    <resultFolder>${project.build.directory}/distribution/darwin/${project.name}.app/Contents/MacOS</resultFolder>
+                                    <resultName>${project.artifactId}</resultName>
                                 </configuration>
                             </execution>
                             <execution>
@@ -97,7 +101,8 @@
                                     <goVersion>${go.sdk.version}</goVersion>
                                     <targetOs>windows</targetOs>
                                     <targetArch>386</targetArch>
-                                    <resultName>${project.build.finalName}-windows32.exe</resultName>
+                                    <resultFolder>${project.build.directory}/distribution/windows32</resultFolder>
+                                    <resultName>${project.name}.exe</resultName>
                                 </configuration>
                             </execution>
                             <execution>
@@ -109,7 +114,52 @@
                                     <goVersion>${go.sdk.version}</goVersion>
                                     <targetOs>windows</targetOs>
                                     <targetArch>amd64</targetArch>
-                                    <resultName>${project.build.finalName}-windows64.exe</resultName>
+                                    <resultFolder>${project.build.directory}/distribution/windows64</resultFolder>
+                                    <resultName>${project.name}.exe</resultName>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <version>3.0.2</version>
+                        <executions>
+                            <execution>
+                                <id>copy-darwin-plist</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}/distribution/darwin/${project.name}.app/Contents</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>src/main/resources</directory>
+                                            <includes>
+                                                <include>Info.plist</include>
+                                            </includes>
+                                            <filtering>true</filtering>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>copy-darwin-icon</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}/distribution/darwin/${project.name}.app/Contents/Resources</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>src/main/resources</directory>
+                                            <includes>
+                                                <include>runelite.icns</include>
+                                            </includes>
+                                        </resource>
+                                    </resources>
                                 </configuration>
                             </execution>
                         </executions>
@@ -138,7 +188,6 @@
                 </executions>
                 <configuration>
                     <processing>go</processing>
-                    <excluded>txt,png</excluded>
                     <keepLines>false</keepLines>
                     <clear>true</clear>
                     <destination>${project.build.directory}/generated-sources</destination>
@@ -167,27 +216,6 @@
                                 <package>github.com/verybluebot/tarinator-go</package>
                                 <package>github.com/gizak/termui</package>
                             </packages>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-install-plugin</artifactId>
-                <version>2.5.2</version>
-                <executions>
-                    <execution>
-                        <id>save-result-as-artifact</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>install-file</goal>
-                        </goals>
-                        <configuration>
-                            <file>${project.build.directory}/${project.build.finalName}</file>
-                            <groupId>${project.groupId}</groupId>
-                            <artifactId>${project.artifactId}-result</artifactId>
-                            <version>${project.version}</version>
-                            <packaging>bin</packaging>
                         </configuration>
                     </execution>
                 </executions>

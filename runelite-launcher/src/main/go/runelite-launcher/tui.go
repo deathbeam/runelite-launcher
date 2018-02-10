@@ -25,32 +25,66 @@
 package main
 
 import (
-	"io/ioutil"
-	"os"
+	"fmt"
+	"github.com/gizak/termui"
+	"log"
+	"time"
 )
 
-func CompareVersion(old string, new string) bool {
-	return old == new
-}
+func CreateTUI(boot func()) {
+	var bar *termui.Gauge
+	var open bool
 
-func ReadVersion(file string) string {
-	b, err := ioutil.ReadFile(file)
-	logger("[Reading](fg-bold) version from [%s](fg-yellow)", file)
+	// Set global logger
+	logger = func (format string, a ...interface{}) {
+		formatted := fmt.Sprintf(format, a...)
 
-	if err != nil {
-		return ""
+		if !open {
+			log.Printf(formatted)
+			return
+		}
+
+		par := termui.NewPar(formatted)
+		par.Border = false
+		par.Height = 1
+
+		termui.Body.AddRows(termui.NewRow(termui.NewCol(12, 0, par)))
+		termui.Body.Align()
+		termui.Render(termui.Body)
 	}
 
-	return string(b)
-}
+	// Set global progress indicator
+	progress = func (value int) {
+		bar.Percent = value
 
-func SaveVersion(file string, version string) {
-	data := []byte(version)
-	err := ioutil.WriteFile(file, data, os.ModePerm)
+		if !open {
+			log.Printf("Downloaded %s", value)
+			return
+		}
+
+		termui.Body.Align()
+		termui.Render(termui.Body)
+	}
+
+	// Set global close function
+	closeWindow = func() {
+		// This does nothing here
+	}
+
+	err := termui.Init()
+	open = true
 
 	if err != nil {
 		panic(err)
 	}
 
-	logger("[Writing](fg-bold) new version [%s](fg-cyan) to [%s](fg-yellow)", version, file)
+	bar = termui.NewGauge()
+	bar.BarColor = termui.ColorCyan
+	termui.Body.AddRows(termui.NewRow(termui.NewCol(12, 0, bar)))
+	termui.Body.Align()
+	termui.Render(termui.Body)
+	boot()
+	open = false
+	time.Sleep(time.Second * 2)
+	termui.Close()
 }

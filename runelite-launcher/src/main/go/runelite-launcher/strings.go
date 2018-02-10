@@ -24,73 +24,12 @@
  */
 package main
 
-import (
-	"fmt"
-	"github.com/gizak/termui"
-	"log"
-	"time"
-)
-
-const strLimit = 60
-var bar *termui.Gauge
-var open bool
-
-func CloseUI()  {
-	open = false
-	time.Sleep(time.Second * 2)
-	termui.Close()
-}
-
-func UpdateProgress(value float64) {
-	bar.Percent = int(value)
-
-	if !open {
-		log.Printf("Downloaded %s", value)
-		return
-	}
-
-	termui.Body.Align()
-	termui.Render(termui.Body)
-}
-
 func LimitString(str string) string {
-	if len(str) > strLimit {
-		return "..." + string(str[len(str)-strLimit:])
-	}
+  const strLimit = 60
 
-	return str
-}
+  if len(str) > strLimit {
+    return "..." + string(str[len(str)-strLimit:])
+  }
 
-func AppLog(format string, a ...interface{}) {
-	formatted := fmt.Sprintf(format, a...)
-
-	if !open {
-		log.Printf(formatted)
-		return
-	}
-
-	par := termui.NewPar(formatted)
-	par.Border = false
-	par.Height = 1
-
-	termui.Body.AddRows(termui.NewRow(termui.NewCol(12, 0, par)))
-	termui.Body.Align()
-	termui.Render(termui.Body)
-}
-
-func CreateUI(boot func()) {
-	err := termui.Init()
-	open = true
-
-	if err != nil {
-		panic(err)
-	}
-
-	bar = termui.NewGauge()
-	bar.BarColor = termui.ColorCyan
-	termui.Body.AddRows(termui.NewRow(termui.NewCol(12, 0, bar)))
-	termui.Body.Align()
-	termui.Render(termui.Body)
-	boot()
-	CloseUI()
+  return str
 }
