@@ -35,7 +35,7 @@ func CompareVersion(old string, new string) bool {
 
 func ReadVersion(file string) string {
 	b, err := ioutil.ReadFile(file)
-	logger("[Reading](fg-bold) version from [%s](fg-yellow)", file)
+	logger("Reading version from %s", file)
 
 	if err != nil {
 		return ""
@@ -52,5 +52,5 @@ func SaveVersion(file string, version string) {
 		panic(err)
 	}
 
-	logger("[Writing](fg-bold) new version [%s](fg-cyan) to [%s](fg-yellow)", version, file)
+	logger("Writing new version %s to %s", version, file)
 }

@@ -90,8 +90,7 @@ func printDownloadPercent(done chan int64, path string, total int64, callback fu
 }
 
 func DownloadFile(url string, dest string, callback func(percent float64)) {
-	logger("[Downloading](fg-bold) [%s](fg-yellow) to [%s](fg-yellow)",
-		LimitString(url), LimitString(dest))
+	logger("Downloading %s to %s", url, dest)
 
 	start := time.Now()
 
@@ -139,12 +138,11 @@ func DownloadFile(url string, dest string, callback func(percent float64)) {
 	done <- n
 
 	elapsed := time.Since(start)
-	logger("Download completed in [%s](fg-cyan)", elapsed)
+	logger("Download completed in fg-cyan", elapsed)
 }
 
 func ExtractFile(file string, dest string) {
-	logger("[Extracting](fg-bold) file [%s](fg-yellow) to [%s](fg-yellow)",
-		LimitString(file), LimitString(dest))
+	logger("Extracting file %s to %s", file, dest)
 
 	start := time.Now()
 	err := tarinator.UnTarinate(dest, file)
@@ -154,5 +152,5 @@ func ExtractFile(file string, dest string) {
 	}
 
 	elapsed := time.Since(start)
-	logger("Extracting completed in [%s](fg-cyan)", elapsed)
+	logger("Extracting completed in %s", elapsed)
 }

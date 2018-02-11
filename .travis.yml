@@ -1,7 +1,15 @@
+sudo: required
 language: go
+services:
+- docker
 addons:
   apt:
     packages:
-      - maven
+    - maven
+install:
+- docker pull karalabe/xgo-latest
 script:
- - mvn clean install -Ptui -q
+- mvn clean install -Pcross -q -Dgithub.global.oauth2Token=$GITHUB_OAUTH_TOKEN
+env:
+  global:
+    secure: eKvwukw/Uk1nZ50ieH1KSn1aNWYysy7jAniv4mttLaFidVxWIABtpJknnqBQCm3+KywOJzIOFsm2D8zhQ/QQbL3lOzxfDytUriyadZbR5aGkIaYuiL1zovRPT+hsHARzdsK+d/Q7NJ7383/LNpsTR1OR1BIyfcNWsQ7ygQGnTbCPysKzxWgxCcObYqSj3pDgE1oeTPCmtg2l6lRl7YhGFJG4oW5YVAkPrv7A54drGtnvoNhOm0R4vSAO1pUigUkHBQtpqS93MB+HtrRD0Ja7TPSfpyzAlsJicNNgFSfjw53Hp19fucSyzncBNRiOd+IGtVAgAgBCgYLEGxX8Fbd28xQwYoLllbH/Vay5WzFJPV88a4uUnQXl/L/yOqu6TBRqm/JGycmXAKNuhlJQjfMdNbJo2OaeGC7yqExdA/fPrA83LzNWoRdVfrryJPbtblQuMnZVKtSW9jYNEu2vH5TYC49oGdHI+83kvV5JcROMeI03b9zmN8P/A9GIzaQGgHGDVIJBJh7tnFlQGdy7BhUQUURaUUoNo+vu4uzBKFA4m8Gl9/fESbaoeN+jZHoB0rIk1sQq025HLPFo3ZJyvM93Vbts+WuG0JNI/zNUc+Nhr5WGUj8UFyCPEjbkrzuuYAIoaRsrXKErTC0TCelocmE5wSc/abx7K4gcbKZovuNz2wo=

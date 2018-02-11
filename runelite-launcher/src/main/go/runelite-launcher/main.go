@@ -42,12 +42,12 @@ var (
 
 func main() {
 	run := func(path string) {
-		logger("Launching %s\n", path)
+		logger("Launching %s", path)
 		cmd := exec.Command(path)
 		cmd.Stdin = os.Stdin
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
-		cmd.Run()
+		cmd.Start()
 	}
 
 	boot := func() {
@@ -65,8 +65,7 @@ func main() {
 
 		// Parse bootstrap properties
 		bootstrapPath := "http://static.runelite.net/bootstrap.json"
-		logger("[Downloading](fg-bold) [%s](fg-yellow) from [%s](fg-yellow)",
-			path.Base(bootstrapPath), LimitString(bootstrapPath))
+		logger("Downloading %s from %s", path.Base(bootstrapPath), bootstrapPath)
 		bootstrap := ReadBootstrap(bootstrapPath)
 		clientArtifactName := bootstrap.Client.ArtifactId
 		clientArtifactVersion := bootstrap.Client.Version
@@ -94,7 +93,7 @@ func main() {
 		launcherCache := path.Join(runeliteHome, "cache")
 		systemCache := path.Join(launcherCache, systemName)
 		distributionCache := path.Join(systemCache, distributionDirName)
-		logger("[Found](fg-bold) system cache directory at [%s](fg-yellow)", LimitString(systemCache))
+		logger("Found system cache directory at %s", systemCache)
 
 		if !FileExists(systemCache) {
 			os.MkdirAll(systemCache, os.ModePerm)
@@ -121,7 +120,7 @@ func main() {
 				progress(int(percent))
 			})
 		} else {
-			logger("[Found](fg-bold) distribution archive at [%s](fg-yellow)", LimitString(distributionArchiveDestination))
+			logger("Found distribution archive at %s", distributionArchiveDestination)
 		}
 
 		// Try to extract distribution if not already extracted
@@ -131,7 +130,7 @@ func main() {
 			ExtractFile(distributionArchiveDestination, systemCache)
 			SaveVersion(distributionCacheVersionPath, distributionArtifactVersion)
 		} else {
-			logger("[Found](fg-bold) distribution at [%s](fg-yellow)", LimitString(systemCache))
+			logger("Found distribution at %s", systemCache)
 		}
 
 		// Try to download shaded jar if not already present
@@ -157,7 +156,7 @@ func main() {
 
 			SaveVersion(clientCacheVersionPath, clientArtifactVersion)
 		} else {
-			logger("[Found](fg-bold) distribution jar at [%s](fg-yellow)", LimitString(distributionJarDestination))
+			logger("Found distribution jar at %s", distributionJarDestination)
 		}
 
 		// Build path to application executable

@@ -13,9 +13,14 @@
     <name>RuneLite Launcher</name>
     <packaging>mvn-golang</packaging>
 
+    <properties>
+        <go.home>${project.build.directory}/go</go.home>
+        <project.go.path>${go.home}/src/${project.artifactId}</project.go.path>
+    </properties>
+
     <profiles>
         <profile>
-            <id>tui</id>
+            <id>cross</id>
             <build>
                 <plugins>
                     <plugin>
@@ -24,10 +29,11 @@
                         <configuration>
                             <goVersion>${go.sdk.version}</goVersion>
                             <command/>
+                            <goPath>${go.home}</goPath>
                         </configuration>
                         <executions>
                             <execution>
-                                <id>get-rsrc</id>
+                                <id>get-build-dependencies</id>
                                 <goals>
                                     <goal>get</goal>
                                 </goals>
@@ -35,46 +41,38 @@
                                     <goVersion>${go.sdk.version}</goVersion>
                                     <packages>
                                         <package>github.com/akavel/rsrc</package>
+                                        <package>github.com/karalabe/xgo</package>
                                     </packages>
                                 </configuration>
                             </execution>
                             <execution>
-                                <id>build-linux64</id>
+                                <id>build-linux</id>
                                 <goals>
-                                    <goal>build</goal>
+                                    <goal>custom</goal>
                                 </goals>
                                 <configuration>
                                     <goVersion>${go.sdk.version}</goVersion>
-                                    <targetOs>linux</targetOs>
-                                    <targetArch>amd64</targetArch>
-                                    <resultFolder>${project.build.directory}/distribution/linux64</resultFolder>
-                                    <resultName>${project.artifactId}</resultName>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>build-linux32</id>
-                                <goals>
-                                    <goal>build</goal>
-                                </goals>
-                                <configuration>
-                                    <goVersion>${go.sdk.version}</goVersion>
-                                    <targetOs>linux</targetOs>
-                                    <targetArch>386</targetArch>
-                                    <resultFolder>${project.build.directory}/distribution/linux32</resultFolder>
-                                    <resultName>${project.artifactId}</resultName>
+                                    <exec>xgo</exec>
+                                    <buildFlags>
+                                        <flag>--out=distribution/${project.artifactId}</flag>
+                                        <flag>--targets=linux/386,linux/amd64</flag>
+                                        <flag>${project.go.path}</flag>
+                                    </buildFlags>
                                 </configuration>
                             </execution>
                             <execution>
                                 <id>build-darwin</id>
                                 <goals>
-                                    <goal>build</goal>
+                                    <goal>custom</goal>
                                 </goals>
                                 <configuration>
                                     <goVersion>${go.sdk.version}</goVersion>
-                                    <targetOs>darwin</targetOs>
-                                    <targetArch>amd64</targetArch>
-                                    <resultFolder>${project.build.directory}/distribution/darwin/${project.name}.app/Contents/MacOS</resultFolder>
-                                    <resultName>${project.artifactId}</resultName>
+                                    <exec>xgo</exec>
+                                    <buildFlags>
+                                        <flag>--out=distribution/${project.name}.app/Contents/MacOS/${project.artifactId}</flag>
+                                        <flag>--targets=darwin/amd64</flag>
+                                        <flag>${project.go.path}</flag>
+                                    </buildFlags>
                                 </configuration>
                             </execution>
                             <execution>
@@ -88,34 +86,25 @@
                                     <buildFlags>
                                         <flag>-ico=${project.basedir}/src/main/resources/runelite.ico</flag>
                                         <flag>-arch=386</flag>
-                                        <flag>-o=${project.build.directory}/generated-sources/icon.syso</flag>
+                                        <flag>-o=${project.go.path}/icon.syso</flag>
                                     </buildFlags>
                                 </configuration>
                             </execution>
                             <execution>
-                                <id>build-windows32</id>
+                                <id>build-windows</id>
                                 <goals>
-                                    <goal>build</goal>
+                                    <goal>custom</goal>
                                 </goals>
                                 <configuration>
                                     <goVersion>${go.sdk.version}</goVersion>
-                                    <targetOs>windows</targetOs>
-                                    <targetArch>386</targetArch>
-                                    <resultFolder>${project.build.directory}/distribution/windows32</resultFolder>
-                                    <resultName>${project.name}.exe</resultName>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>build-windows64</id>
-                                <goals>
-                                    <goal>build</goal>
-                                </goals>
-                                <configuration>
-                                    <goVersion>${go.sdk.version}</goVersion>
-                                    <targetOs>windows</targetOs>
-                                    <targetArch>amd64</targetArch>
-                                    <resultFolder>${project.build.directory}/distribution/windows64</resultFolder>
-                                    <resultName>${project.name}.exe</resultName>
+                                    <exec>xgo</exec>
+                                    <buildFlags>
+                                        <flag>--out=distribution/${project.artifactId}</flag>
+                                        <flag>--targets=windows/386,windows/amd64</flag>
+                                        <flag>--ldflags</flag>
+                                        <flag>-H windowsgui</flag>
+                                        <flag>${project.go.path}</flag>
+                                    </buildFlags>
                                 </configuration>
                             </execution>
                         </executions>
@@ -126,13 +115,32 @@
                         <version>3.0.2</version>
                         <executions>
                             <execution>
+                                <id>copy-to-path</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${user.home}/go/src/${project.artifactId}</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${project.go.path}</directory>
+                                            <includes>
+                                                <include>Info.plist</include>
+                                            </includes>
+                                            <filtering>true</filtering>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                            <execution>
                                 <id>copy-darwin-plist</id>
                                 <phase>validate</phase>
                                 <goals>
                                     <goal>copy-resources</goal>
                                 </goals>
                                 <configuration>
-                                    <outputDirectory>${project.build.directory}/distribution/darwin/${project.name}.app/Contents</outputDirectory>
+                                    <outputDirectory>${project.go.path}/distribution/${project.name}.app/Contents</outputDirectory>
                                     <resources>
                                         <resource>
                                             <directory>src/main/resources</directory>
@@ -151,207 +159,7 @@
                                     <goal>copy-resources</goal>
                                 </goals>
                                 <configuration>
-                                    <outputDirectory>${project.build.directory}/distribution/darwin/${project.name}.app/Contents/Resources</outputDirectory>
-                                    <resources>
-                                        <resource>
-                                            <directory>src/main/resources</directory>
-                                            <includes>
-                                                <include>runelite.icns</include>
-                                            </includes>
-                                        </resource>
-                                    </resources>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>gui</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.igormaznitsa</groupId>
-                        <artifactId>mvn-golang-wrapper</artifactId>
-                        <configuration>
-                            <goVersion>${go.sdk.version}</goVersion>
-                            <command/>
-                            <env>
-                                <CGO_ENABLED>1</CGO_ENABLED>
-                            </env>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>get-dependencies-gui</id>
-                                <goals>
-                                    <goal>get</goal>
-                                </goals>
-                                <configuration>
-                                    <goVersion>${go.sdk.version}</goVersion>
-                                    <packages>
-                                        <package>github.com/aarzilli/nucular</package>
-                                    </packages>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>get-rsrc</id>
-                                <goals>
-                                    <goal>get</goal>
-                                </goals>
-                                <configuration>
-                                    <goVersion>${go.sdk.version}</goVersion>
-                                    <packages>
-                                        <package>github.com/akavel/rsrc</package>
-                                    </packages>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>build-linux64</id>
-                                <goals>
-                                    <goal>build</goal>
-                                </goals>
-                                <configuration>
-                                    <env>
-                                        <CC>x86_64-pc-linux-gnu-gcc</CC>
-                                    </env>
-                                    <buildFlags>
-                                        <flag>-tags=gui</flag>
-                                    </buildFlags>
-                                    <goVersion>${go.sdk.version}</goVersion>
-                                    <targetOs>linux</targetOs>
-                                    <targetArch>amd64</targetArch>
-                                    <resultFolder>${project.build.directory}/distribution/linux64</resultFolder>
-                                    <resultName>${project.artifactId}</resultName>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>build-linux32</id>
-                                <goals>
-                                    <goal>build</goal>
-                                </goals>
-                                <configuration>
-                                    <env>
-                                        <CC>x86_64-pc-linux-gnu-gcc -m32</CC>
-                                    </env>
-                                    <buildFlags>
-                                        <flag>-tags=gui</flag>
-                                    </buildFlags>
-                                    <goVersion>${go.sdk.version}</goVersion>
-                                    <targetOs>linux</targetOs>
-                                    <targetArch>386</targetArch>
-                                    <resultFolder>${project.build.directory}/distribution/linux32</resultFolder>
-                                    <resultName>${project.artifactId}</resultName>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>build-darwin</id>
-                                <goals>
-                                    <goal>build</goal>
-                                </goals>
-                                <configuration>
-                                    <env>
-                                        <CC>x86_64-apple-darwin15-cc</CC>
-                                    </env>
-                                    <buildFlags>
-                                        <flag>-tags=gui</flag>
-                                    </buildFlags>
-                                    <goVersion>${go.sdk.version}</goVersion>
-                                    <targetOs>darwin</targetOs>
-                                    <targetArch>amd64</targetArch>
-                                    <resultFolder>${project.build.directory}/distribution/darwin/${project.name}.app/Contents/MacOS</resultFolder>
-                                    <resultName>${project.artifactId}</resultName>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>generate-windows-icon</id>
-                                <goals>
-                                    <goal>custom</goal>
-                                </goals>
-                                <configuration>
-                                    <goVersion>${go.sdk.version}</goVersion>
-                                    <exec>rsrc</exec>
-                                    <buildFlags>
-                                        <flag>-ico=${project.basedir}/src/main/resources/runelite.ico</flag>
-                                        <flag>-arch=386</flag>
-                                        <flag>-o=${project.build.directory}/generated-sources/icon.syso</flag>
-                                    </buildFlags>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>build-windows32</id>
-                                <goals>
-                                    <goal>build</goal>
-                                </goals>
-                                <configuration>
-                                    <env>
-                                        <CC>x86_64-w64-mingw32-gcc</CC>
-                                    </env>
-                                    <buildFlags>
-                                        <flag>-tags=gui</flag>
-                                    </buildFlags>
-                                    <ldFlags>-H windowsgui</ldFlags>
-                                    <goVersion>${go.sdk.version}</goVersion>
-                                    <targetOs>windows</targetOs>
-                                    <targetArch>386</targetArch>
-                                    <resultFolder>${project.build.directory}/distribution/windows32</resultFolder>
-                                    <resultName>${project.name}.exe</resultName>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>build-windows64</id>
-                                <goals>
-                                    <goal>build</goal>
-                                </goals>
-                                <configuration>
-                                    <env>
-                                        <CC>i686-w64-mingw32-gcc</CC>
-                                    </env>
-                                    <buildFlags>
-                                        <flag>-tags=gui</flag>
-                                    </buildFlags>
-                                    <ldFlags>-H windowsgui</ldFlags>
-                                    <goVersion>${go.sdk.version}</goVersion>
-                                    <targetOs>windows</targetOs>
-                                    <targetArch>amd64</targetArch>
-                                    <resultFolder>${project.build.directory}/distribution/windows64</resultFolder>
-                                    <resultName>${project.name}.exe</resultName>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-resources-plugin</artifactId>
-                        <version>3.0.2</version>
-                        <executions>
-                            <execution>
-                                <id>copy-darwin-plist</id>
-                                <phase>validate</phase>
-                                <goals>
-                                    <goal>copy-resources</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>${project.build.directory}/distribution/darwin/${project.name}.app/Contents</outputDirectory>
-                                    <resources>
-                                        <resource>
-                                            <directory>src/main/resources</directory>
-                                            <includes>
-                                                <include>Info.plist</include>
-                                            </includes>
-                                            <filtering>true</filtering>
-                                        </resource>
-                                    </resources>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>copy-darwin-icon</id>
-                                <phase>validate</phase>
-                                <goals>
-                                    <goal>copy-resources</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>${project.build.directory}/distribution/darwin/${project.name}.app/Contents/Resources</outputDirectory>
+                                    <outputDirectory>${project.go.path}/distribution/${project.name}.app/Contents/Resources</outputDirectory>
                                     <resources>
                                         <resource>
                                             <directory>src/main/resources</directory>
@@ -390,7 +198,7 @@
                     <processing>go</processing>
                     <keepLines>false</keepLines>
                     <clear>true</clear>
-                    <destination>${project.build.directory}/generated-sources</destination>
+                    <destination>${project.go.path}</destination>
                 </configuration>
             </plugin>
             <plugin>
@@ -400,7 +208,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <goVersion>${go.sdk.version}</goVersion>
-                    <sources>${project.build.directory}/generated-sources</sources>
+                    <sources>${project.go.path}</sources>
                     <command/>
                 </configuration>
                 <executions>
@@ -414,7 +222,7 @@
                             <packages>
                                 <package>github.com/mitchellh/go-homedir</package>
                                 <package>github.com/verybluebot/tarinator-go</package>
-                                <package>github.com/gizak/termui</package>
+                                <package>github.com/aarzilli/nucular</package>
                             </packages>
                         </configuration>
                     </execution>

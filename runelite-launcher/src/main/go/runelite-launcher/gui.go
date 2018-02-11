@@ -1,5 +1,3 @@
-// +build gui
-
 /*
  * Copyright (c) 2018, Tomas Slusny <slusnucky@gmail.com>
  * All rights reserved.
@@ -43,6 +41,16 @@ func CreateUI(boot func()) {
 	var lines []string
 	var curProgress int
 
+	window := nucular.NewMasterWindow(0, title, func(window *nucular.Window) {
+		window.Row(24).Dynamic(1)
+		window.Progress(&curProgress, 100, false)
+
+		for _, line := range lines  {
+			window.Row(24).Dynamic(1)
+			window.Label(line, "LT")
+		}
+	})
+
 	// Set global logger
 	logger = func (format string, a ...interface{}) {
 		formatted := fmt.Sprintf(format, a...)
@@ -53,6 +61,7 @@ func CreateUI(boot func()) {
 		}
 
 		lines = append(lines, formatted)
+		window.Changed()
 	}
 
 
@@ -64,21 +73,12 @@ func CreateUI(boot func()) {
 		}
 
 		curProgress = value
+		window.Changed()
 	}
-
-	window := nucular.NewMasterWindow(0, title, func(window *nucular.Window) {
-		window.Row(24).Dynamic(1)
-		window.Progress(&curProgress, 100, false)
-
-		for _, line := range lines  {
-			window.Row(24).Dynamic(1)
-			window.Label(line, "LT")
-		}
-	})
 
 	// Set global window closing function
 	closeWindow = func() {
-		time.Sleep(time.Second * 5)
+		time.Sleep(time.Second * 2)
 		window.Close()
 	}
 

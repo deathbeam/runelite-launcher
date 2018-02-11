@@ -9,27 +9,19 @@ mvn clean install
 This will build distribution for all major platforms (linux32, linux64, windows32, windows64, darwin)
 and runelite-launcher for your current platform.
 
-### Cross-compiling GUI launcher
+### Cross-compiling launcher
 
-For cross-compilation of GUI launcher, various libraries and compiler toolchains are needed, mainly:
-
-* Standard GNU GCC
-* MinGW64
-* osxcross (or being on osx)
-
-To cross-compile GUI (linux32, linux64, windows32, windows64, darwin), run
+For cross-compilation of GUI launcher, you will need [Docker](https://www.docker.com/).  
+Now, you need to pull docker image maven will use for cross-compilation:
 
 ```
-mvn clean install -Pgui
+docker pull karalabe/xgo-latest
 ```
 
-### Cross-compiling TUI launcher
-
-Cross-compiling TUI launcher is a lot simplier, as all we need is Go compiler and nothing else.
-To cross-compile TUI (linux32, linux64, windows32, windows64, darwin), run
+Now, to actually cross-compile to all platforms (linux32, linux64, windows32, windows64, darwin), run
 
 ```
-mvn clean install -Ptui
+mvn clean install -Pcross
 ```
 
 ## Launching the launcher
