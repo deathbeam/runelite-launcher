@@ -138,7 +138,7 @@ func DownloadFile(url string, dest string, callback func(percent float64)) {
 	done <- n
 
 	elapsed := time.Since(start)
-	logger("Download completed in fg-cyan", elapsed)
+	logger("Download completed in %s", elapsed)
 }
 
 func ExtractFile(file string, dest string) {

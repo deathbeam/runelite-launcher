@@ -24,7 +24,11 @@
  */
 package main
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"net/http"
+	"time"
+)
 
 type Client struct {
 	ArtifactId string `json:"artifactId"`
@@ -46,4 +50,25 @@ func ReadBootstrap(url string) Bootstrap {
 	}
 
 	return bootstrap
+}
+
+type Tag struct {
+	Name string `json:"name"`
+}
+
+func GetLatestTag(repo string) Tag {
+	var url = "https://api.github.com/repos/" + repo + "/tags"
+	logger("Getting latest tag from %s repository", repo)
+
+	var myClient = &http.Client{Timeout: 10 * time.Second}
+	r, httpErr := myClient.Get(url)
+
+	if httpErr != nil {
+		panic(httpErr)
+	}
+
+	defer r.Body.Close()
+	var tags []Tag
+	json.NewDecoder(r.Body).Decode(&tags)
+	return tags[0]
 }

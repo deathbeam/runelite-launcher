@@ -63,6 +63,7 @@ func main() {
 			}
 		}
 
+
 		// Parse bootstrap properties
 		bootstrapPath := "http://static.runelite.net/bootstrap.json"
 		logger("Downloading %s from %s", path.Base(bootstrapPath), bootstrapPath)
@@ -72,9 +73,9 @@ func main() {
 		clientArtifactGroupId := bootstrap.Client.GroupId
 		clientJarName := fmt.Sprintf("%s-%s-shaded.jar", clientArtifactName, clientArtifactVersion)
 
-		// TODO: Parse distribution properties from somewhere
+		// Get latest distribution from tag from git
 		distributionArtifactName := "runelite-distribution"
-		distributionArtifactVersion := "1.0.0"
+		distributionArtifactVersion := strings.Replace(GetLatestTag("deathbeam/runelite-launcher").Name, "v", "", 1)
 		distributionArtifactGroupId := "/*$mvn.project.groupId$*/"
 		distributionDirName := fmt.Sprintf("%s-%s",
 			distributionArtifactName,

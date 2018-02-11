@@ -170,6 +170,28 @@
                             </execution>
                         </executions>
                     </plugin>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/assembly/archive-distribution-linux32.xml</descriptor>
+                                <descriptor>src/assembly/archive-distribution-linux64.xml</descriptor>
+                                <descriptor>src/assembly/archive-distribution-windows32.xml</descriptor>
+                                <descriptor>src/assembly/archive-distribution-windows64.xml</descriptor>
+                                <descriptor>src/assembly/archive-distribution-darwin.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>archive</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
