@@ -36,41 +36,20 @@ func DownloadArtifact(artifact Artifact, repository Repository) (string, bool) {
   return artifactDestination, changed
 }
 
-func ProcessRemoteArchive(artifact Artifact, repository Repository, cache string, systemName string) string {
+func ProcessArtifact(artifact Artifact, repository Repository, cache string) {
   // Download artifact
-  distributionArtifactPath, distributionArtifactChanged := DownloadArtifact(artifact, repository)
+  artifactPath, artifactChanged := DownloadArtifact(artifact, repository)
 
-  // Setup path to extracted distribution
-  distributionDirName := fmt.Sprintf("%s-%s", artifact.ArtifactId, artifact.Version)
-  distributionPath := path.Join(cache, distributionDirName)
+  if artifactChanged || !CompareFiles(artifactPath, cache) {
 
-  if systemName == "darwin" {
-    distributionPath = path.Join(distributionPath, "Contents", "Resources")
-  }
-
-  // Extract distribution if it is .tar*
-  if strings.Contains(distributionArtifactPath, ".tar") &&
-    distributionArtifactChanged ||
-    !FileExists(distributionPath) {
-
-    os.RemoveAll(cache)
-    os.MkdirAll(cache, os.ModePerm)
-    ExtractFile(distributionArtifactPath, cache)
-  }
-
-  return distributionPath
-}
-
-func ProcessRemoteExecutable(artifact Artifact, repository Repository, cache string) {
-  // Download artifact
-  clientArtifactPath, clientArtifactChanged := DownloadArtifact(artifact, repository)
-
-  // Setup path to extracted executable
-  distributionJarName := fmt.Sprintf("%s.jar", path.Base(cache))
-  distributionJarDestination := path.Join(cache, distributionJarName)
-
-  // Replace distribution executable with downloaded one
-  if clientArtifactChanged || !CompareFiles(clientArtifactPath, distributionJarDestination) {
-    CopyFile(clientArtifactPath, distributionJarDestination)
+    if strings.Contains(artifactPath, ".tar") {
+      // Extract artifact if it is .tar*
+      os.RemoveAll(cache)
+      os.MkdirAll(cache, os.ModePerm)
+      ExtractFile(artifactPath, cache)
+    } else {
+      // Replace artifact with new one
+      CopyFile(artifactPath, cache)
+    }
   }
 }

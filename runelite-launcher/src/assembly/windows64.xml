@@ -3,14 +3,16 @@
   xmlns="http://maven.apache.org/ASSEMBLY/2.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd">
-  <id>archive-distribution-linux64</id>
+  <id>windows64</id>
+  <includeBaseDirectory>false</includeBaseDirectory>
   <formats>
-    <format>tar.gz</format>
+    <format>zip</format>
   </formats>
-  <fileSets>
-    <fileSet>
-      <directory>${project.build.directory}/distribution/linux64</directory>
-      <outputDirectory/>
-    </fileSet>
-  </fileSets>
+  <files>
+    <file>
+      <source>
+        ${project.go.path}/distribution/${project.artifactId}-windows-4.0-amd64.exe
+      </source>
+    </file>
+  </files>
 </assembly>

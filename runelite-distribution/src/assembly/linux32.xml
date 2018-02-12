@@ -3,13 +3,14 @@
   xmlns="http://maven.apache.org/ASSEMBLY/2.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd">
-  <id>archive-distribution-darwin</id>
+  <id>linux32</id>
+  <includeBaseDirectory>false</includeBaseDirectory>
   <formats>
-    <format>zip</format>
+    <format>tar.gz</format>
   </formats>
   <fileSets>
     <fileSet>
-      <directory>${project.go.path}/distribution/RuneLite Launcher.app</directory>
+      <directory>${project.build.directory}/distribution/linux32</directory>
       <outputDirectory/>
     </fileSet>
   </fileSets>

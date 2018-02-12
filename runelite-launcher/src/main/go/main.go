@@ -83,7 +83,7 @@ func main() {
 			ArtifactId: "runelite-distribution",
 			GroupId: "/*$mvn.project.groupId$*/",
 			Version: strings.Replace(latestTag.Name, "v", "", 1),
-			Suffix: fmt.Sprintf("-archive-distribution-%s.tar.gz", systemName),
+			Suffix: fmt.Sprintf("-%s.tar.gz", systemName),
 		}
 
 		// Create runelite repository and client artifact
@@ -99,22 +99,34 @@ func main() {
 			Suffix: "-shaded.jar",
 		}
 
-		// Download, process, unarchive, copy distribution and client
-		distributionPath := ProcessRemoteArchive(distributionArtifact, distributionRepository, distributionCache, systemName)
-		ProcessRemoteExecutable(clientArtifact, clientRepository, distributionPath)
+		// Download and unarchive distribution
+		ProcessArtifact(distributionArtifact, distributionRepository, distributionCache)
 
-		// Build path to application executable
-		distributionNativePath := distributionPath
+		// Build path to application jar
+		distributionJarPath := distributionCache
 
 		if systemName == "darwin" {
-			distributionNativePath = path.Join(distributionNativePath, "Contents", "MacOS", distributionArtifact.ArtifactId)
-		} else if strings.Contains(systemName, "windows") {
-			distributionNativePath = path.Join(distributionNativePath, distributionArtifact.ArtifactId + ".exe")
-		} else {
-			distributionNativePath = path.Join(distributionNativePath, distributionArtifact.ArtifactId)
+			distributionJarPath = path.Join(distributionJarPath, "Contents", "Resources")
 		}
 
-		run(distributionNativePath)
+		distributionJarPath = path.Join(
+			distributionJarPath,
+			fmt.Sprintf("%s-%s.jar", distributionArtifact.ArtifactId, distributionArtifact.Version))
+
+		ProcessArtifact(clientArtifact, clientRepository, distributionJarPath)
+
+		// Build path to application executable
+		distributionExecutablePath := distributionCache
+
+		if systemName == "darwin" {
+			distributionExecutablePath = path.Join(distributionExecutablePath, "Contents", "MacOS", distributionArtifact.ArtifactId)
+		} else if strings.Contains(systemName, "windows") {
+			distributionExecutablePath = path.Join(distributionExecutablePath, distributionArtifact.ArtifactId + ".exe")
+		} else {
+			distributionExecutablePath = path.Join(distributionExecutablePath, distributionArtifact.ArtifactId)
+		}
+
+		run(distributionExecutablePath)
 	}
 
 	CreateUI(boot)

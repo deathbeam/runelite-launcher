@@ -175,11 +175,11 @@
                         <version>3.1.0</version>
                         <configuration>
                             <descriptors>
-                                <descriptor>src/assembly/archive-distribution-linux32.xml</descriptor>
-                                <descriptor>src/assembly/archive-distribution-linux64.xml</descriptor>
-                                <descriptor>src/assembly/archive-distribution-windows32.xml</descriptor>
-                                <descriptor>src/assembly/archive-distribution-windows64.xml</descriptor>
-                                <descriptor>src/assembly/archive-distribution-darwin.xml</descriptor>
+                                <descriptor>src/assembly/linux32.xml</descriptor>
+                                <descriptor>src/assembly/linux64.xml</descriptor>
+                                <descriptor>src/assembly/windows32.xml</descriptor>
+                                <descriptor>src/assembly/windows64.xml</descriptor>
+                                <descriptor>src/assembly/darwin.xml</descriptor>
                             </descriptors>
                         </configuration>
                         <executions>
