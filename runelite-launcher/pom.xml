@@ -113,27 +113,8 @@
                         <version>3.0.2</version>
                         <executions>
                             <execution>
-                                <id>copy-to-path</id>
-                                <phase>compile</phase>
-                                <goals>
-                                    <goal>copy-resources</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>${user.home}/go/src/${project.artifactId}</outputDirectory>
-                                    <resources>
-                                        <resource>
-                                            <directory>${project.go.path}</directory>
-                                            <includes>
-                                                <include>Info.plist</include>
-                                            </includes>
-                                            <filtering>true</filtering>
-                                        </resource>
-                                    </resources>
-                                </configuration>
-                            </execution>
-                            <execution>
                                 <id>copy-darwin-plist</id>
-                                <phase>validate</phase>
+                                <phase>compile</phase>
                                 <goals>
                                     <goal>copy-resources</goal>
                                 </goals>
@@ -152,7 +133,7 @@
                             </execution>
                             <execution>
                                 <id>copy-darwin-icon</id>
-                                <phase>validate</phase>
+                                <phase>compile</phase>
                                 <goals>
                                     <goal>copy-resources</goal>
                                 </goals>
