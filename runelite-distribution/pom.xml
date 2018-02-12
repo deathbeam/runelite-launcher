@@ -122,6 +122,15 @@
                                 <argument>net.runelite.client.RuneLite</argument>
                                 <argument>--output</argument>
                                 <argument>${project.build.directory}/distribution/linux32</argument>
+                                <argument>--vmargs</argument>
+                                <argument>Xmx512m</argument>
+                                <argument>Xms2m</argument>
+                                <argument>Dsun.java2d.noddraw=true</argument>
+                                <argument>XX:CompileThreshold=1500</argument>
+                                <argument>Xincgc</argument>
+                                <argument>XX:+UseConcMarkSweepGC</argument>
+                                <argument>XX:+UseParNewGC</argument>
+                                <argument>Djna.nosys=true</argument>
                             </arguments>
                         </configuration>
                     </execution>
@@ -154,6 +163,15 @@
                                 <argument>net.runelite.client.RuneLite</argument>
                                 <argument>--output</argument>
                                 <argument>${project.build.directory}/distribution/linux64</argument>
+                                <argument>--vmargs</argument>
+                                <argument>Xmx512m</argument>
+                                <argument>Xms2m</argument>
+                                <argument>Dsun.java2d.noddraw=true</argument>
+                                <argument>XX:CompileThreshold=1500</argument>
+                                <argument>Xincgc</argument>
+                                <argument>XX:+UseConcMarkSweepGC</argument>
+                                <argument>XX:+UseParNewGC</argument>
+                                <argument>Djna.nosys=true</argument>
                             </arguments>
                         </configuration>
                     </execution>
@@ -186,6 +204,15 @@
                                 <argument>net.runelite.client.RuneLite</argument>
                                 <argument>--output</argument>
                                 <argument>${project.build.directory}/distribution/windows32</argument>
+                                <argument>--vmargs</argument>
+                                <argument>Xmx512m</argument>
+                                <argument>Xms2m</argument>
+                                <argument>Dsun.java2d.noddraw=true</argument>
+                                <argument>XX:CompileThreshold=1500</argument>
+                                <argument>Xincgc</argument>
+                                <argument>XX:+UseConcMarkSweepGC</argument>
+                                <argument>XX:+UseParNewGC</argument>
+                                <argument>Djna.nosys=true</argument>
                             </arguments>
                         </configuration>
                     </execution>
@@ -218,6 +245,15 @@
                                 <argument>net.runelite.client.RuneLite</argument>
                                 <argument>--output</argument>
                                 <argument>${project.build.directory}/distribution/windows64</argument>
+                                <argument>--vmargs</argument>
+                                <argument>Xmx512m</argument>
+                                <argument>Xms2m</argument>
+                                <argument>Dsun.java2d.noddraw=true</argument>
+                                <argument>XX:CompileThreshold=1500</argument>
+                                <argument>Xincgc</argument>
+                                <argument>XX:+UseConcMarkSweepGC</argument>
+                                <argument>XX:+UseParNewGC</argument>
+                                <argument>Djna.nosys=true</argument>
                             </arguments>
                         </configuration>
                     </execution>
@@ -250,6 +286,15 @@
                                 <argument>net.runelite.client.RuneLite</argument>
                                 <argument>--output</argument>
                                 <argument>${project.build.directory}/distribution/darwin</argument>
+                                <argument>--vmargs</argument>
+                                <argument>Xmx512m</argument>
+                                <argument>Xms2m</argument>
+                                <argument>Dsun.java2d.noddraw=true</argument>
+                                <argument>XX:CompileThreshold=1500</argument>
+                                <argument>Xincgc</argument>
+                                <argument>XX:+UseConcMarkSweepGC</argument>
+                                <argument>XX:+UseParNewGC</argument>
+                                <argument>Djna.nosys=true</argument>
                             </arguments>
                         </configuration>
                     </execution>
@@ -287,12 +332,38 @@
                 </configuration>
             </plugin>
             <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.0.2</version>
+                <executions>
+                    <execution>
+                        <id>copy-maven-metadata</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.directory}/mvn-repo/net/runelite/launcher/${project.artifactId}</directory>
+                                    <includes>
+                                        <include>maven-metadata.xml</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>com.github.github</groupId>
                 <artifactId>site-maven-plugin</artifactId>
                 <version>0.12</version>
                 <configuration>
                     <message>Maven artifacts for ${project.version}</message>
                     <noJekyll>true</noJekyll>
+                    <merge>true</merge>
                     <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory>
                     <branch>refs/heads/mvn-repo</branch>
                     <includes>
@@ -300,7 +371,6 @@
                     </includes>
                     <repositoryName>runelite-launcher</repositoryName>
                     <repositoryOwner>deathbeam</repositoryOwner>
-                    <merge>true</merge>
                 </configuration>
                 <executions>
                     <execution>
@@ -313,5 +383,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
