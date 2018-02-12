@@ -32,7 +32,7 @@ import (
 )
 
 func CreateUI(boot func()) {
-	const title  = "/*$mvn.project.name$*/"
+	const title  = "/*$mvn.project.name$*/ /*$mvn.project.version$*/"
 	const lineSize = 16
 	const theme = style.DarkTheme
 	const scaling = 1
