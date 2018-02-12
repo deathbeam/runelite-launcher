@@ -26,9 +26,8 @@ package main
 
 import (
 	"encoding/json"
-	"net/http"
+	"encoding/xml"
 	"path"
-	"time"
 )
 
 type Client struct {
@@ -54,23 +53,31 @@ func ReadBootstrap(url string) Bootstrap {
 	return bootstrap
 }
 
-type Tag struct {
-	Name string `json:"name"`
+type MavenVersions struct {
+	Version string `xml:"version"`
 }
 
-func GetLatestTag(repo string) Tag {
-	var url = "https://api.github.com/repos/" + repo + "/tags"
-	logger.LogLine("Getting latest tag from %s repository", repo)
+type MavenVersioning struct {
+	Release string `xml:"release"`
+	Versions MavenVersions `xml:"versions"`
+	LastUpdated string `xml:"lastUpdated"`
+}
 
-	var myClient = &http.Client{Timeout: 10 * time.Second}
-	r, httpErr := myClient.Get(url)
+type MavenMetadata struct {
+	ArtifactId string `xml:"artifactId"`
+	GroupId string `xml:"groupId"`
+	Versioning MavenVersioning `xml:"versioning"`
+}
 
-	if httpErr != nil {
-		panic(httpErr)
+func ReadMavenMetadata(url string) MavenMetadata {
+	logger.LogLine("Reading %s from %s", path.Base(url), url)
+	file := FetchFile(url)
+
+	var mavenMetadata MavenMetadata
+
+	if err := xml.Unmarshal(file, &mavenMetadata); err != nil {
+		panic(err)
 	}
 
-	defer r.Body.Close()
-	var tags []Tag
-	json.NewDecoder(r.Body).Decode(&tags)
-	return tags[0]
+	return mavenMetadata
 }

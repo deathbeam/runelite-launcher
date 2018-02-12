@@ -52,35 +52,19 @@ func CompareFiles(left string, right string) bool {
 		return false
 	}
 
-	leftFile, err := os.Open(left)
+	leftFile, err := os.Stat(left)
 
 	if err != nil {
 		return false
 	}
 
-	leftFileStat, err := leftFile.Stat()
+	rightFile, err := os.Stat(right)
 
 	if err != nil {
 		return false
 	}
 
-	leftFileSize := leftFileStat.Size()
-
-	rightFile, err := os.Open(right)
-
-	if err != nil {
-		return false
-	}
-
-	rightFileStat, err := rightFile.Stat()
-
-	if err != nil {
-		return false
-	}
-
-	rightFileSize := rightFileStat.Size()
-
-	return leftFileSize == rightFileSize
+	return leftFile.IsDir() || rightFile.IsDir() || leftFile.Size() == rightFile.Size()
 }
 
 func FileExists(name string) bool {
@@ -96,13 +80,7 @@ func printDownloadPercent(done chan int64, path string, total int64) {
 		case <-done:
 			stop = true
 		default:
-
-			file, err := os.Open(path)
-			if err != nil {
-				panic(err)
-			}
-
-			fi, err := file.Stat()
+			fi, err := os.Stat(path)
 
 			if err != nil {
 				panic(err)

@@ -5,3 +5,4 @@ nb-configuration.xml
 project.properties
 *.iml
 .idea/
+*.log

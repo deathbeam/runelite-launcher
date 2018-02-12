@@ -33,10 +33,10 @@ type Logger struct {
 
 // Create default implementation of logger
 var defaultLogger = Logger{
-  func(format string, a ...interface{}) {
+  LogLine: func(format string, a ...interface{}) {
     log.Printf(format + "\n", a...)
   },
-  func(progress int) {
+  UpdateProgress: func(progress int) {
     log.Printf("Progress is %d%%\n", progress)
   },
 }

@@ -42,6 +42,7 @@ func main() {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 		cmd.Start()
+		os.Exit(0)
 	}
 
 	boot := func() {
@@ -61,17 +62,11 @@ func main() {
 		home, _ := homedir.Dir()
 		runeliteHome := path.Join(home, ".runelite")
 		launcherCache := path.Join(runeliteHome, "cache")
-		distributionCache := path.Join(launcherCache, "distribution")
+		distributionCache := path.Join(launcherCache, "runelite")
 
 		if !FileExists(launcherCache) {
 			os.MkdirAll(launcherCache, os.ModePerm)
 		}
-
-		// Parse bootstrap properties
-		bootstrap := ReadBootstrap("http://static.runelite.net/bootstrap.json")
-
-		// Get latest repository tag
-		latestTag := GetLatestTag("deathbeam/runelite-launcher")
 
 		// Create distribution repository and distribution artifact
 		distributionRepository := Repository{
@@ -79,10 +74,13 @@ func main() {
 			LocalPath: launcherCache,
 		}
 
+		// Get latest repository metadata
+		mavenMetadata := ReadMavenMetadata(fmt.Sprintf("%s/maven-metadata.xml", distributionRepository.Url))
+
 		distributionArtifact := Artifact{
-			ArtifactId: "runelite-distribution",
-			GroupId: "/*$mvn.project.groupId$*/",
-			Version: strings.Replace(latestTag.Name, "v", "", 1),
+			ArtifactId: mavenMetadata.ArtifactId,
+			GroupId: mavenMetadata.GroupId,
+			Version: mavenMetadata.Versioning.Release,
 			Suffix: fmt.Sprintf("-%s.tar.gz", systemName),
 		}
 
@@ -91,6 +89,9 @@ func main() {
 			Url: "http://repo.runelite.net",
 			LocalPath: launcherCache,
 		}
+
+		// Parse bootstrap properties
+		bootstrap := ReadBootstrap("http://static.runelite.net/bootstrap.json")
 
 		clientArtifact := Artifact{
 			ArtifactId: bootstrap.Client.ArtifactId,
@@ -113,6 +114,7 @@ func main() {
 			distributionJarPath,
 			fmt.Sprintf("%s-%s.jar", distributionArtifact.ArtifactId, distributionArtifact.Version))
 
+		// Download and copy client
 		ProcessArtifact(clientArtifact, clientRepository, distributionJarPath)
 
 		// Build path to application executable
