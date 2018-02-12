@@ -24,33 +24,21 @@
  */
 package main
 
-import (
-	"io/ioutil"
-	"os"
-)
+import "log"
 
-func CompareVersion(old string, new string) bool {
-	return old == new
+type Logger struct {
+  LogLine func(format string, a ...interface{})
+  UpdateProgress func(progress int)
 }
 
-func ReadVersion(file string) string {
-	b, err := ioutil.ReadFile(file)
-	logger("Reading version from %s", file)
-
-	if err != nil {
-		return ""
-	}
-
-	return string(b)
+// Create default implementation of logger
+var defaultLogger = Logger{
+  func(format string, a ...interface{}) {
+    log.Printf(format + "\n", a...)
+  },
+  func(progress int) {
+    log.Printf("Progress is %d%%\n", progress)
+  },
 }
 
-func SaveVersion(file string, version string) {
-	data := []byte(version)
-	err := ioutil.WriteFile(file, data, os.ModePerm)
-
-	if err != nil {
-		panic(err)
-	}
-
-	logger("Writing new version %s to %s", version, file)
-}
+var logger = defaultLogger

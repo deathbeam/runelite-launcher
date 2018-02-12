@@ -47,12 +47,48 @@ func FetchFile(url string) []byte {
 	return buf.Bytes()
 }
 
+func CompareFiles(left string, right string) bool {
+	if !FileExists(left) || !FileExists(right) {
+		return false
+	}
+
+	leftFile, err := os.Open(left)
+
+	if err != nil {
+		return false
+	}
+
+	leftFileStat, err := leftFile.Stat()
+
+	if err != nil {
+		return false
+	}
+
+	leftFileSize := leftFileStat.Size()
+
+	rightFile, err := os.Open(right)
+
+	if err != nil {
+		return false
+	}
+
+	rightFileStat, err := rightFile.Stat()
+
+	if err != nil {
+		return false
+	}
+
+	rightFileSize := rightFileStat.Size()
+
+	return leftFileSize == rightFileSize
+}
+
 func FileExists(name string) bool {
 	_, err := os.Stat(name)
 	return !os.IsNotExist(err)
 }
 
-func printDownloadPercent(done chan int64, path string, total int64, callback func(progress float64)) {
+func printDownloadPercent(done chan int64, path string, total int64) {
 	stop := false
 
 	for {
@@ -67,6 +103,7 @@ func printDownloadPercent(done chan int64, path string, total int64, callback fu
 			}
 
 			fi, err := file.Stat()
+
 			if err != nil {
 				panic(err)
 			}
@@ -78,7 +115,7 @@ func printDownloadPercent(done chan int64, path string, total int64, callback fu
 			}
 
 			var percent = float64(size) / float64(total) * 100
-			callback(percent)
+			logger.UpdateProgress(int(percent))
 		}
 
 		if stop {
@@ -89,8 +126,8 @@ func printDownloadPercent(done chan int64, path string, total int64, callback fu
 	}
 }
 
-func DownloadFile(url string, dest string, callback func(percent float64)) {
-	logger("Downloading %s to %s", url, dest)
+func DownloadFile(url string, dest string) {
+	logger.LogLine("Downloading %s to %s", url, dest)
 
 	start := time.Now()
 
@@ -119,7 +156,7 @@ func DownloadFile(url string, dest string, callback func(percent float64)) {
 
 	done := make(chan int64)
 
-	go printDownloadPercent(done, dest, int64(size), callback)
+	go printDownloadPercent(done, dest, int64(size))
 
 	resp, err := http.Get(url)
 
@@ -138,11 +175,11 @@ func DownloadFile(url string, dest string, callback func(percent float64)) {
 	done <- n
 
 	elapsed := time.Since(start)
-	logger("Download completed in %s", elapsed)
+	logger.LogLine("Download completed in %s", elapsed)
 }
 
 func ExtractFile(file string, dest string) {
-	logger("Extracting file %s to %s", file, dest)
+	logger.LogLine("Extracting file %s to %s", file, dest)
 
 	start := time.Now()
 	err := tarinator.UnTarinate(dest, file)
@@ -152,5 +189,40 @@ func ExtractFile(file string, dest string) {
 	}
 
 	elapsed := time.Since(start)
-	logger("Extracting completed in %s", elapsed)
+	logger.LogLine("Extracting completed in %s", elapsed)
+}
+
+func CopyFile(src, dst string) {
+	logger.LogLine("Copying file %s to %s", src, dst)
+	start := time.Now()
+
+	in, err := os.Open(src)
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer in.Close()
+
+	out, err := os.Create(dst)
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer out.Close()
+
+	_, err = io.Copy(out, in)
+	if err != nil {
+		panic(err)
+	}
+
+	elapsed := time.Since(start)
+	err = out.Close()
+
+	if err != nil {
+		panic(err)
+	}
+
+	logger.LogLine("Copying completed in %s", elapsed)
 }

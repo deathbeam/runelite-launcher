@@ -32,7 +32,7 @@ public class RuneLite
             "You are trying to launch dummy launcher.\n" +
                 "This means that you probably do not have correctly updated RuneLite client.\n" +
                 "Try to clear ~/.runelite/cache and run the launcher again.\n" +
-                "If nothing changed, please file an issue here: https://github.com/runelite/launcher");
+                "If nothing changed, please file an issue here: https://github.com/deathbeam/runelite-launcher");
 
         System.exit(1);
     }

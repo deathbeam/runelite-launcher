@@ -27,6 +27,7 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"path"
 	"time"
 )
 
@@ -41,6 +42,7 @@ type Bootstrap struct {
 }
 
 func ReadBootstrap(url string) Bootstrap {
+	logger.LogLine("Reading %s from %s", path.Base(url), url)
 	file := FetchFile(url)
 
 	var bootstrap Bootstrap
@@ -58,7 +60,7 @@ type Tag struct {
 
 func GetLatestTag(repo string) Tag {
 	var url = "https://api.github.com/repos/" + repo + "/tags"
-	logger("Getting latest tag from %s repository", repo)
+	logger.LogLine("Getting latest tag from %s repository", repo)
 
 	var myClient = &http.Client{Timeout: 10 * time.Second}
 	r, httpErr := myClient.Get(url)

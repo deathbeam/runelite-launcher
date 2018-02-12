@@ -27,64 +27,66 @@ package main
 import (
 	"fmt"
 	"github.com/aarzilli/nucular"
-	nstyle "github.com/aarzilli/nucular/style"
-	"log"
+	"github.com/aarzilli/nucular/style"
 	"time"
 )
 
 func CreateUI(boot func()) {
 	const title  = "/*$mvn.project.name$*/"
-	const theme = nstyle.DarkTheme
+	const lineSize = 16
+	const theme = style.DarkTheme
 	const scaling = 1
 
-	var open bool
 	var lines []string
 	var curProgress int
 
+	// Create main window with layout
 	window := nucular.NewMasterWindow(0, title, func(window *nucular.Window) {
-		window.Row(24).Dynamic(1)
+		window.Row(lineSize).Dynamic(1)
 		window.Progress(&curProgress, 100, false)
 
 		for _, line := range lines  {
-			window.Row(24).Dynamic(1)
+			window.Row(lineSize).Dynamic(1)
 			window.Label(line, "LT")
 		}
 	})
 
-	// Set global logger
-	logger = func (format string, a ...interface{}) {
-		formatted := fmt.Sprintf(format, a...)
+	// Set GUI style to dark theme
+	window.SetStyle(style.FromTheme(theme, scaling))
 
-		if !open {
-			log.Printf(formatted)
-			return
-		}
-
-		lines = append(lines, formatted)
-		window.Changed()
+	// Create custom GUI logger
+	guiLogger := Logger{
+		LogLine: func (format string, a ...interface{}) {
+			defaultLogger.LogLine(format, a...)
+			formatted := fmt.Sprintf(format, a...)
+			lines = append(lines, formatted)
+			window.Changed()
+		},
+		UpdateProgress: func (value int) {
+			defaultLogger.UpdateProgress(value)
+			curProgress = value
+			window.Changed()
+		},
 	}
 
+	// Create main function
+	main := func() {
+		// Set logger to use GUI instead of console
+		logger = guiLogger
 
-	// Set global progress indicator
-	progress = func (value int) {
-		if !open {
-			log.Printf("Downloaded %s", value)
-			return
-		}
+		// Run provided boot function
+		boot()
 
-		curProgress = value
-		window.Changed()
-	}
-
-	// Set global window closing function
-	closeWindow = func() {
+		// Close window after booting is done
+		// Wait 2 seconds before closing the window to prevent closing before window has been fully initialized
 		time.Sleep(time.Second * 2)
 		window.Close()
+
+		// Restore default logger after GUI window is closed
+		logger = defaultLogger
 	}
 
-	window.SetStyle(nstyle.FromTheme(theme, scaling))
-	go boot()
-	open = true
+	// Run main function and start window main loop
+	go main()
 	window.Main()
-	open = false
 }

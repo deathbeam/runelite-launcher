@@ -34,15 +34,9 @@ import (
 	"strings"
 )
 
-var (
-	logger func(format string, a ...interface{})
-	progress func(value int)
-	closeWindow func()
-)
-
 func main() {
 	run := func(path string) {
-		logger("Launching %s", path)
+		logger.LogLine("Launching %s", path)
 		cmd := exec.Command(path)
 		cmd.Stdin = os.Stdin
 		cmd.Stdout = os.Stdout
@@ -63,116 +57,64 @@ func main() {
 			}
 		}
 
-
-		// Parse bootstrap properties
-		bootstrapPath := "http://static.runelite.net/bootstrap.json"
-		logger("Downloading %s from %s", path.Base(bootstrapPath), bootstrapPath)
-		bootstrap := ReadBootstrap(bootstrapPath)
-		clientArtifactName := bootstrap.Client.ArtifactId
-		clientArtifactVersion := bootstrap.Client.Version
-		clientArtifactGroupId := bootstrap.Client.GroupId
-		clientJarName := fmt.Sprintf("%s-%s-shaded.jar", clientArtifactName, clientArtifactVersion)
-
-		// Get latest distribution from tag from git
-		distributionArtifactName := "runelite-distribution"
-		distributionArtifactVersion := strings.Replace(GetLatestTag("deathbeam/runelite-launcher").Name, "v", "", 1)
-		distributionArtifactGroupId := "/*$mvn.project.groupId$*/"
-		distributionDirName := fmt.Sprintf("%s-%s",
-			distributionArtifactName,
-			distributionArtifactVersion)
-		distributionJarName := fmt.Sprintf("%s-%s.jar",
-			distributionArtifactName,
-			distributionArtifactVersion)
-		distributionArchiveName := fmt.Sprintf("%s-%s-archive-distribution-%s.tar.gz",
-			distributionArtifactName,
-			distributionArtifactVersion,
-			systemName)
-
 		// Setup cache directories
 		home, _ := homedir.Dir()
 		runeliteHome := path.Join(home, ".runelite")
 		launcherCache := path.Join(runeliteHome, "cache")
-		systemCache := path.Join(launcherCache, systemName)
-		distributionCache := path.Join(systemCache, distributionDirName)
-		logger("Found system cache directory at %s", systemCache)
+		distributionCache := path.Join(launcherCache, "distribution")
 
-		if !FileExists(systemCache) {
-			os.MkdirAll(systemCache, os.ModePerm)
+		if !FileExists(launcherCache) {
+			os.MkdirAll(launcherCache, os.ModePerm)
 		}
 
-		// Setup versions
-		distributionCacheVersionPath := path.Join(launcherCache, ".version-distribution")
-		distributionCacheVersion := ReadVersion(distributionCacheVersionPath)
-		clientCacheVersionPath := path.Join(launcherCache, ".version-client")
-		clientCacheVersion := ReadVersion(clientCacheVersionPath)
+		// Parse bootstrap properties
+		bootstrap := ReadBootstrap("http://static.runelite.net/bootstrap.json")
 
-		// Try to download distribution if not already downloaded
-		distributionArchiveDestination := path.Join(launcherCache, distributionArchiveName)
+		// Get latest repository tag
+		latestTag := GetLatestTag("deathbeam/runelite-launcher")
 
-		if !FileExists(distributionArchiveDestination) || !CompareVersion(distributionCacheVersion, distributionArtifactVersion) {
-			baseUrl := "https://github.com/deathbeam/runelite-launcher/raw/mvn-repo"
-			groupPath := strings.Replace(distributionArtifactGroupId, ".", "/", -1)
-			archiveUrl := fmt.Sprintf("%s/%s/%s/%s/%s",
-				baseUrl, groupPath, distributionArtifactName, distributionArtifactVersion, distributionArchiveName)
-
-			os.RemoveAll(archiveUrl)
-
-			DownloadFile(archiveUrl, distributionArchiveDestination, func(percent float64) {
-				progress(int(percent))
-			})
-		} else {
-			logger("Found distribution archive at %s", distributionArchiveDestination)
+		// Create distribution repository and distribution artifact
+		distributionRepository := Repository{
+			Url: "https://github.com/deathbeam/runelite-launcher/raw/mvn-repo",
+			LocalPath: launcherCache,
 		}
 
-		// Try to extract distribution if not already extracted
-		if !FileExists(systemCache) || !CompareVersion(distributionCacheVersion, distributionArtifactVersion) {
-			os.RemoveAll(systemCache)
-			os.MkdirAll(systemCache, os.ModePerm)
-			ExtractFile(distributionArchiveDestination, systemCache)
-			SaveVersion(distributionCacheVersionPath, distributionArtifactVersion)
-		} else {
-			logger("Found distribution at %s", systemCache)
+		distributionArtifact := Artifact{
+			ArtifactId: "runelite-distribution",
+			GroupId: "/*$mvn.project.groupId$*/",
+			Version: strings.Replace(latestTag.Name, "v", "", 1),
+			Suffix: fmt.Sprintf("-archive-distribution-%s.tar.gz", systemName),
 		}
 
-		// Try to download shaded jar if not already present
-		distributionPath := distributionCache
-
-		if systemName == "darwin" {
-			distributionPath = path.Join(distributionPath, "Contents", "Resources")
+		// Create runelite repository and client artifact
+		clientRepository := Repository{
+			Url: "http://repo.runelite.net",
+			LocalPath: launcherCache,
 		}
 
-		distributionJarDestination := path.Join(distributionPath, distributionJarName)
-
-		if !FileExists(distributionJarDestination) || !CompareVersion(clientCacheVersion, clientArtifactVersion) {
-			baseUrl := "http://repo.runelite.net/"
-			groupPath := strings.Replace(clientArtifactGroupId, ".", "/", -1)
-			shadedJarUrl := fmt.Sprintf("%s/%s/%s/%s/%s",
-				baseUrl, groupPath, clientArtifactName, clientArtifactVersion, clientJarName)
-
-			os.RemoveAll(distributionJarDestination)
-
-			DownloadFile(shadedJarUrl, distributionJarDestination, func(percent float64) {
-				progress(int(percent))
-			})
-
-			SaveVersion(clientCacheVersionPath, clientArtifactVersion)
-		} else {
-			logger("Found distribution jar at %s", distributionJarDestination)
+		clientArtifact := Artifact{
+			ArtifactId: bootstrap.Client.ArtifactId,
+			GroupId: bootstrap.Client.GroupId,
+			Version: bootstrap.Client.Version,
+			Suffix: "-shaded.jar",
 		}
+
+		// Download, process, unarchive, copy distribution and client
+		distributionPath := ProcessRemoteArchive(distributionArtifact, distributionRepository, distributionCache, systemName)
+		ProcessRemoteExecutable(clientArtifact, clientRepository, distributionPath)
 
 		// Build path to application executable
-		distributionNativePath := distributionCache
+		distributionNativePath := distributionPath
 
 		if systemName == "darwin" {
-			distributionNativePath = path.Join(distributionNativePath, "Contents", "MacOS", distributionArtifactName)
+			distributionNativePath = path.Join(distributionNativePath, "Contents", "MacOS", distributionArtifact.ArtifactId)
 		} else if strings.Contains(systemName, "windows") {
-			distributionNativePath = path.Join(distributionNativePath, distributionArtifactName+".exe")
+			distributionNativePath = path.Join(distributionNativePath, distributionArtifact.ArtifactId + ".exe")
 		} else {
-			distributionNativePath = path.Join(distributionNativePath, distributionArtifactName)
+			distributionNativePath = path.Join(distributionNativePath, distributionArtifact.ArtifactId)
 		}
 
-		go run(distributionNativePath)
-		closeWindow()
+		run(distributionNativePath)
 	}
 
 	CreateUI(boot)
