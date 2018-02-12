@@ -1,5 +1,7 @@
 # runelite-launcher
 
+![preview](https://i.imgur.com/ErgwVrI.png)
+
 ## Building
 
 ```shell
