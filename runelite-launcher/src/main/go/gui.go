@@ -28,28 +28,70 @@ import (
 	"fmt"
 	"github.com/aarzilli/nucular"
 	"github.com/aarzilli/nucular/style"
+	"image"
+	"strings"
 	"time"
 )
 
 func CreateUI(boot func()) {
 	const title  = "/*$mvn.project.name$*/ /*$mvn.project.version$*/"
 	const lineSize = 16
-	const theme = style.DarkTheme
+	const theme = style.DefaultTheme
 	const scaling = 1
+	const windowWidth = 640
+	const windowHeight = 300
+	const windowFlags = nucular.WindowBorder |
+		nucular.WindowMovable |
+		nucular.WindowTitle |
+		nucular.WindowClosable |
+		nucular.WindowNoScrollbar
 
 	var lines []string
 	var curProgress int
 
-	// Create main window with layout
-	window := nucular.NewMasterWindow(0, title, func(window *nucular.Window) {
-		window.Row(lineSize).Dynamic(1)
-		window.Progress(&curProgress, 100, false)
 
-		for _, line := range lines  {
-			window.Row(lineSize).Dynamic(1)
-			window.Label(line, "LT")
+	wordWrap := func(text string, lineWidth int) []string {
+		words := strings.Fields(strings.TrimSpace(text))
+
+		if len(words) == 0 {
+			return []string{ text }
 		}
-	})
+
+		wrapped := words[0]
+		spaceLeft := lineWidth - len(wrapped)
+
+		for _, word := range words[1:] {
+			if len(word)+1 > spaceLeft {
+				wrapped += "\n  " + word
+				spaceLeft = lineWidth - len(word)
+			} else {
+				wrapped += " " + word
+				spaceLeft -= 1 + len(word)
+			}
+		}
+
+		return strings.Split(wrapped, "\n")
+
+	}
+
+	// Create main window with layout
+	window := nucular.NewMasterWindowSize(windowFlags, title, image.Point{X: windowWidth, Y: windowHeight},
+		func(window *nucular.Window) {
+			window.Row(lineSize).Dynamic(1)
+			window.Progress(&curProgress, 100, false)
+			linesLen := len(lines)
+
+			for i := range lines  {
+				line := "> " + lines[linesLen - 1 - i]
+				wrappedLines := wordWrap(line, window.Bounds.W / 7 - 2)
+				window.Row(2).Dynamic(1)
+
+				for _, wrappedLine := range wrappedLines {
+					window.Row(lineSize - 2).Dynamic(1)
+					window.Label(wrappedLine, "LT")
+				}
+			}
+		})
 
 	// Set GUI style to dark theme
 	window.SetStyle(style.FromTheme(theme, scaling))
@@ -63,7 +105,6 @@ func CreateUI(boot func()) {
 			window.Changed()
 		},
 		UpdateProgress: func (value int) {
-			defaultLogger.UpdateProgress(value)
 			curProgress = value
 			window.Changed()
 		},

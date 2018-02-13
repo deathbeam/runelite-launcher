@@ -31,6 +31,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path"
 	"strconv"
 	"time"
 )
@@ -105,7 +106,7 @@ func printDownloadPercent(done chan int64, path string, total int64) {
 }
 
 func DownloadFile(url string, dest string) {
-	logger.LogLine("Downloading %s to %s", url, dest)
+	logger.LogLine("Downloading %s to %s", path.Base(url), dest)
 
 	start := time.Now()
 
@@ -157,7 +158,7 @@ func DownloadFile(url string, dest string) {
 }
 
 func ExtractFile(file string, dest string) {
-	logger.LogLine("Extracting file %s to %s", file, dest)
+	logger.LogLine("Extracting file %s to %s", path.Base(file), dest)
 
 	start := time.Now()
 	err := tarinator.UnTarinate(dest, file)
@@ -171,7 +172,7 @@ func ExtractFile(file string, dest string) {
 }
 
 func CopyFile(src, dst string) {
-	logger.LogLine("Copying file %s to %s", src, dst)
+	logger.LogLine("Copying file %s to %s", path.Base(src), dst)
 	start := time.Now()
 
 	in, err := os.Open(src)
