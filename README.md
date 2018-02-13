@@ -1,6 +1,6 @@
 # runelite-launcher
 
-![preview](https://i.imgur.com/ErgwVrI.png)
+![clean](https://i.imgur.com/HchTzSG.png)
 
 ## Building
 
