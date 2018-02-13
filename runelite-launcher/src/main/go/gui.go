@@ -43,8 +43,7 @@ func CreateUI(boot func()) {
 	const windowFlags = nucular.WindowBorder |
 		nucular.WindowMovable |
 		nucular.WindowTitle |
-		nucular.WindowClosable |
-		nucular.WindowNoScrollbar
+		nucular.WindowClosable
 
 	var lines []string
 	var curProgress int

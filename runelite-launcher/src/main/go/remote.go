@@ -27,7 +27,6 @@ package main
 import (
 	"encoding/json"
 	"encoding/xml"
-	"path"
 )
 
 type Client struct {
@@ -40,17 +39,21 @@ type Bootstrap struct {
 	Client Client `json:"client"`
 }
 
-func ReadBootstrap(url string) Bootstrap {
-	logger.LogLine("Reading %s from %s", path.Base(url), url)
-	file := FetchFile(url)
-
+func ReadBootstrap(url string) (Bootstrap, error) {
+	logger.LogLine("Reading %v...", url)
 	var bootstrap Bootstrap
 
-	if err := json.Unmarshal(file, &bootstrap); err != nil {
-		panic(err)
+	file, err := FetchFile(url)
+
+	if err != nil {
+		return bootstrap, err
 	}
 
-	return bootstrap
+	if err = json.Unmarshal(file, &bootstrap); err != nil {
+		return bootstrap, err
+	}
+
+	return bootstrap, nil
 }
 
 type MavenVersions struct {
@@ -69,15 +72,19 @@ type MavenMetadata struct {
 	Versioning MavenVersioning `xml:"versioning"`
 }
 
-func ReadMavenMetadata(url string) MavenMetadata {
-	logger.LogLine("Reading %s from %s", path.Base(url), url)
-	file := FetchFile(url)
-
+func ReadMavenMetadata(url string) (MavenMetadata, error) {
+	logger.LogLine("Reading %v...", url)
 	var mavenMetadata MavenMetadata
 
-	if err := xml.Unmarshal(file, &mavenMetadata); err != nil {
-		panic(err)
+	file, err := FetchFile(url)
+
+	if err != nil {
+		return mavenMetadata, err
 	}
 
-	return mavenMetadata
+	if err = xml.Unmarshal(file, &mavenMetadata); err != nil {
+		return mavenMetadata, err
+	}
+
+	return mavenMetadata, nil
 }

@@ -43,7 +43,7 @@ type Repository struct {
   LocalPath string
 }
 
-func DownloadArtifact(artifact Artifact, repository Repository) (string, bool) {
+func DownloadArtifact(artifact Artifact, repository Repository) (string, bool, error) {
   groupPath := strings.Replace(artifact.GroupId, ".", "/", -1)
   artifactName := fmt.Sprintf("%s-%s%s", artifact.ArtifactId, artifact.Version, artifact.Suffix)
   artifactUrl := fmt.Sprintf("%s/%s/%s/%s/%s",
@@ -54,25 +54,39 @@ func DownloadArtifact(artifact Artifact, repository Repository) (string, bool) {
 
   if !FileExists(artifactDestination) {
     changed = true
-    DownloadFile(artifactUrl, artifactDestination)
+
+    if err := DownloadFile(artifactUrl, artifactDestination); err != nil {
+      return artifactDestination, changed, err
+    }
   }
 
-  return artifactDestination, changed
+  return artifactDestination, changed, nil
 }
 
-func ProcessArtifact(artifact Artifact, repository Repository, cache string) {
+func ProcessArtifact(artifact Artifact, repository Repository, cache string) error {
   // Download artifact
-  artifactPath, artifactChanged := DownloadArtifact(artifact, repository)
+  artifactPath, artifactChanged, err := DownloadArtifact(artifact, repository)
+
+  if err != nil {
+    return err
+  }
 
   if artifactChanged || !CompareFiles(artifactPath, cache) {
     if strings.Contains(artifactPath, ".tar") {
       // Extract artifact if it is .tar*
       os.RemoveAll(cache)
       os.MkdirAll(cache, os.ModePerm)
-      ExtractFile(artifactPath, cache)
+
+      if err = ExtractFile(artifactPath, cache); err != nil {
+        return err
+      }
     } else {
       // Replace artifact with new one
-      CopyFile(artifactPath, cache)
+      if err = CopyFile(artifactPath, cache); err != nil {
+        return err
+      }
     }
   }
+
+  return nil
 }

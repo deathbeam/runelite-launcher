@@ -26,27 +26,13 @@ package main
 
 import (
 	"bytes"
-	"fmt"
-	"github.com/verybluebot/tarinator-go"
+	"github.com/cavaliercoder/grab"
+	"github.com/mholt/archiver"
 	"io"
 	"net/http"
 	"os"
-	"path"
-	"strconv"
 	"time"
 )
-
-func FetchFile(url string) []byte {
-	resp, err := http.Get(url)
-	if err != nil {
-		panic(err)
-	}
-
-	defer resp.Body.Close()
-	buf := new(bytes.Buffer)
-	buf.ReadFrom(resp.Body)
-	return buf.Bytes()
-}
 
 func CompareFiles(left string, right string) bool {
 	if !FileExists(left) || !FileExists(right) {
@@ -73,135 +59,94 @@ func FileExists(name string) bool {
 	return !os.IsNotExist(err)
 }
 
-func printDownloadPercent(done chan int64, path string, total int64) {
-	stop := false
+func FetchFile(url string) ([]byte, error) {
+	resp, err := http.Get(url)
 
-	for {
-		select {
-		case <-done:
-			stop = true
-		default:
-			fi, err := os.Stat(path)
-
-			if err != nil {
-				panic(err)
-			}
-
-			size := fi.Size()
-
-			if size == 0 {
-				size = 1
-			}
-
-			var percent = float64(size) / float64(total) * 100
-			logger.UpdateProgress(int(percent))
-		}
-
-		if stop {
-			break
-		}
-
-		time.Sleep(time.Second)
+	if err != nil {
+		return []byte{}, err
 	}
+
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(resp.Body)
+
+	if err = resp.Body.Close(); err != nil {
+		return []byte{}, err
+	}
+
+	return buf.Bytes(), nil
 }
 
-func DownloadFile(url string, dest string) {
-	logger.LogLine("Downloading %s to %s", path.Base(url), dest)
+func DownloadFile(url string, dest string) error {
+	// create client
+	client := grab.NewClient()
+	req, _ := grab.NewRequest(dest, url)
 
-	start := time.Now()
+	// start download
+	logger.LogLine("Downloading %v...", req.URL())
+	resp := client.Do(req)
+	logger.LogLine("%v", resp.HTTPResponse.Status)
+
+	// start UI loop
+	t := time.NewTicker(500 * time.Millisecond)
+	defer t.Stop()
+
+Loop:
+	for {
+		select {
+		case <-t.C:
+			logger.UpdateProgress(int(100 * resp.Progress()))
+		case <-resp.Done:
+			break Loop
+		}
+	}
+
+	// check for errors
+	if err := resp.Err(); err != nil {
+		return err
+	}
+
+	logger.LogLine("Download saved to %v", resp.Filename)
+	return nil
+}
+
+func ExtractFile(file string, dest string) error {
+	logger.LogLine("Extracting %v...", file)
+
+	if err := archiver.TarGz.Open(file, dest); err != nil {
+		return err
+	}
+
+	logger.LogLine("Archive extracted to %v", dest)
+	return nil
+}
+
+func CopyFile(file string, dest string) error {
+	logger.LogLine("Copying %v...", file)
+
+	in, err := os.Open(file)
+
+	if err != nil {
+		return err
+	}
 
 	out, err := os.Create(dest)
 
 	if err != nil {
-		fmt.Println(dest)
-		panic(err)
+		return err
 	}
 
-	defer out.Close()
-
-	headResp, err := http.Head(url)
-
-	if err != nil {
-		panic(err)
+	if _, err = io.Copy(out, in); err != nil {
+		return err
 	}
 
-	defer headResp.Body.Close()
-
-	size, err := strconv.Atoi(headResp.Header.Get("Content-Length"))
-
-	if err != nil {
-		panic(err)
+	if err = in.Close(); err != nil {
+		return err
 	}
 
-	done := make(chan int64)
-
-	go printDownloadPercent(done, dest, int64(size))
-
-	resp, err := http.Get(url)
-
-	if err != nil {
-		panic(err)
+	if err = out.Close(); err != nil {
+		return err
 	}
 
-	defer resp.Body.Close()
-
-	n, err := io.Copy(out, resp.Body)
-
-	if err != nil {
-		panic(err)
-	}
-
-	done <- n
-
-	elapsed := time.Since(start)
-	logger.LogLine("Download completed in %s", elapsed)
-}
-
-func ExtractFile(file string, dest string) {
-	logger.LogLine("Extracting file %s to %s", path.Base(file), dest)
-
-	start := time.Now()
-	err := tarinator.UnTarinate(dest, file)
-
-	if err != nil {
-		panic(err)
-	}
-
-	elapsed := time.Since(start)
-	logger.LogLine("Extracting completed in %s", elapsed)
-}
-
-func CopyFile(src, dst string) {
-	logger.LogLine("Copying file %s to %s", path.Base(src), dst)
-	start := time.Now()
-
-	in, err := os.Open(src)
-
-	if err != nil {
-		panic(err)
-	}
-
-	defer in.Close()
-
-	out, err := os.Create(dst)
-
-	if err != nil {
-		panic(err)
-	}
-
-	defer out.Close()
-
-	_, err = io.Copy(out, in)
-	if err != nil {
-		panic(err)
-	}
-
-	elapsed := time.Since(start)
-	err = out.Close()
-
-	if err != nil {
-		panic(err)
-	}
-
-	logger.LogLine("Copying completed in %s", elapsed)
+	logger.LogLine("File copied to %v", dest)
+	return nil
 }

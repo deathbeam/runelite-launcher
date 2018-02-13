@@ -222,7 +222,8 @@
                             <goVersion>${go.sdk.version}</goVersion>
                             <packages>
                                 <package>github.com/mitchellh/go-homedir</package>
-                                <package>github.com/verybluebot/tarinator-go</package>
+                                <package>github.com/mholt/archiver</package>
+                                <package>github.com/cavaliercoder/grab</package>
                                 <package>github.com/aarzilli/nucular</package>
                             </packages>
                         </configuration>

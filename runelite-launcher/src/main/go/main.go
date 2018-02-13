@@ -35,17 +35,39 @@ import (
 )
 
 func main() {
-	run := func(path string) {
-		logger.LogLine("Launching %s", path)
+	// Setup cache directories
+	home, err := homedir.Dir()
+
+	if err != nil {
+		panic(err)
+	}
+
+	runeliteHome := path.Join(home, ".runelite")
+	launcherCache := path.Join(runeliteHome, "cache")
+	distributionCache := path.Join(launcherCache, "runelite")
+
+	if !FileExists(launcherCache) {
+		if err := os.MkdirAll(launcherCache, os.ModePerm); err != nil {
+			panic(err)
+		}
+	}
+
+	run := func(path string) error {
+		logger.LogLine("Launching %v...", path)
 		cmd := exec.Command(path)
 		cmd.Stdin = os.Stdin
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
-		cmd.Start()
+
+		if err := cmd.Start(); err != nil {
+			return err
+		}
+
 		os.Exit(0)
+		return nil
 	}
 
-	boot := func() {
+	boot := func() error {
 		// Build system name
 		systemName := runtime.GOOS
 
@@ -58,16 +80,6 @@ func main() {
 			}
 		}
 
-		// Setup cache directories
-		home, _ := homedir.Dir()
-		runeliteHome := path.Join(home, ".runelite")
-		launcherCache := path.Join(runeliteHome, "cache")
-		distributionCache := path.Join(launcherCache, "runelite")
-
-		if !FileExists(launcherCache) {
-			os.MkdirAll(launcherCache, os.ModePerm)
-		}
-
 		// Create distribution repository and distribution artifact
 		distributionRepository := Repository{
 			Url: "https://github.com/deathbeam/runelite-launcher/raw/mvn-repo",
@@ -75,7 +87,11 @@ func main() {
 		}
 
 		// Get latest repository metadata
-		mavenMetadata := ReadMavenMetadata(fmt.Sprintf("%s/maven-metadata.xml", distributionRepository.Url))
+		mavenMetadata, err := ReadMavenMetadata(fmt.Sprintf("%s/maven-metadata.xml", distributionRepository.Url))
+
+		if err != nil {
+			return err
+		}
 
 		distributionArtifact := Artifact{
 			ArtifactId: mavenMetadata.ArtifactId,
@@ -91,7 +107,11 @@ func main() {
 		}
 
 		// Parse bootstrap properties
-		bootstrap := ReadBootstrap("http://static.runelite.net/bootstrap.json")
+		bootstrap, err := ReadBootstrap("http://static.runelite.net/bootstrap.json")
+
+		if err != nil {
+			return err
+		}
 
 		clientArtifact := Artifact{
 			ArtifactId: bootstrap.Client.ArtifactId,
@@ -101,7 +121,9 @@ func main() {
 		}
 
 		// Download and unarchive distribution
-		ProcessArtifact(distributionArtifact, distributionRepository, distributionCache)
+		if err = ProcessArtifact(distributionArtifact, distributionRepository, distributionCache); err != nil {
+			return err
+		}
 
 		// Build path to application jar
 		distributionJarPath := distributionCache
@@ -115,7 +137,9 @@ func main() {
 			fmt.Sprintf("%s-%s.jar", distributionArtifact.ArtifactId, distributionArtifact.Version))
 
 		// Download and copy client
-		ProcessArtifact(clientArtifact, clientRepository, distributionJarPath)
+		if err = ProcessArtifact(clientArtifact, clientRepository, distributionJarPath); err != nil {
+			return err
+		}
 
 		// Build path to application executable
 		distributionExecutablePath := distributionCache
@@ -128,8 +152,34 @@ func main() {
 			distributionExecutablePath = path.Join(distributionExecutablePath, distributionArtifact.ArtifactId)
 		}
 
-		run(distributionExecutablePath)
+		if err = run(distributionExecutablePath); err != nil {
+			return err
+		}
+
+		return nil
 	}
 
-	CreateUI(boot)
+	safeBoot := func() {
+		const maxRetries = 3
+
+		for i := 1; i <= maxRetries; i++ {
+			err := boot()
+
+			if err == nil {
+				break
+			}
+
+			logger.LogLine("Unexpected error occurred: %s", err)
+
+			if i == maxRetries {
+				panic(err)
+				os.Exit(1)
+			}
+
+			logger.LogLine("Cleaning cache and retrying (%d of %d)...", i, maxRetries)
+			os.RemoveAll(launcherCache)
+		}
+	}
+
+	CreateUI(safeBoot)
 }
