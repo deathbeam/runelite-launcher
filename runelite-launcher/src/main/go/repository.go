@@ -44,10 +44,26 @@ type Repository struct {
 }
 
 func DownloadArtifact(artifact Artifact, repository Repository) (string, bool, error) {
+
   groupPath := strings.Replace(artifact.GroupId, ".", "/", -1)
-  artifactName := fmt.Sprintf("%s-%s%s", artifact.ArtifactId, artifact.Version, artifact.Suffix)
-  artifactUrl := fmt.Sprintf("%s/%s/%s/%s/%s",
-    repository.Url, groupPath, artifact.ArtifactId, artifact.Version, artifactName)
+  artifactVersion := artifact.Version
+  artifactRepoUrl := fmt.Sprintf("%s/%s/%s", repository.Url, groupPath, artifact.ArtifactId)
+  artifactRepoVersionedUrl := fmt.Sprintf("%s/%s", artifactRepoUrl, artifactVersion)
+
+  if strings.Contains(artifactVersion, "SNAPSHOT") {
+    mavenMetadata, err := ReadMavenMetadata(artifactRepoVersionedUrl + "/maven-metadata.xml")
+
+    if err != nil {
+      return "", false, err
+    }
+
+    snapshotMetadata := mavenMetadata.Versioning.Snapshot
+    artifactVersion = strings.Replace(artifactVersion, "SNAPSHOT", "", 1) +
+      snapshotMetadata.TimeStamp + "-" + snapshotMetadata.BuildNumber
+  }
+
+  artifactName := fmt.Sprintf("%s-%s%s", artifact.ArtifactId, artifactVersion, artifact.Suffix)
+  artifactUrl := fmt.Sprintf("%s/%s", artifactRepoVersionedUrl, artifactName)
 
   artifactDestination := path.Join(repository.LocalPath, artifactName)
   changed := false

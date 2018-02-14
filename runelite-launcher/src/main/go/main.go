@@ -44,7 +44,7 @@ func main() {
 
 	runeliteHome := path.Join(home, ".runelite")
 	launcherCache := path.Join(runeliteHome, "cache")
-	distributionCache := path.Join(launcherCache, "runelite")
+	distributionCache := path.Join(launcherCache, "RuneLite")
 
 	if !FileExists(launcherCache) {
 		if err := os.MkdirAll(launcherCache, os.ModePerm); err != nil {
@@ -80,24 +80,31 @@ func main() {
 			}
 		}
 
-		// Create distribution repository and distribution artifact
-		distributionRepository := Repository{
-			Url: "https://github.com/deathbeam/runelite-launcher/raw/mvn-repo",
-			LocalPath: launcherCache,
-		}
-
-		// Get latest repository metadata
-		mavenMetadata, err := ReadMavenMetadata(fmt.Sprintf("%s/maven-metadata.xml", distributionRepository.Url))
+		// Parse distribution bootstrap properties
+		distributionBootstrap, err := ReadBootstrap("/*$mvn.project.property.distribution.bootstrap.url$*/")
 
 		if err != nil {
 			return err
 		}
 
+		// Create distribution repository and distribution artifact
+		distributionRepository := Repository{
+			Url: "/*$mvn.project.property.distribution.repository.url$*/",
+			LocalPath: launcherCache,
+		}
+
 		distributionArtifact := Artifact{
-			ArtifactId: mavenMetadata.ArtifactId,
-			GroupId: mavenMetadata.GroupId,
-			Version: mavenMetadata.Versioning.Release,
-			Suffix: fmt.Sprintf("-%s.tar.gz", systemName),
+			ArtifactId: distributionBootstrap.Client.ArtifactId,
+			GroupId: distributionBootstrap.Client.GroupId,
+			Version: distributionBootstrap.Client.Version,
+			Suffix: fmt.Sprintf("-%s.%s", systemName, distributionBootstrap.Client.Extension),
+		}
+
+		// Parse client bootstrap properties
+		clientBootstrap, err := ReadBootstrap("http://static.runelite.net/bootstrap.json")
+
+		if err != nil {
+			return err
 		}
 
 		// Create runelite repository and client artifact
@@ -106,18 +113,11 @@ func main() {
 			LocalPath: launcherCache,
 		}
 
-		// Parse bootstrap properties
-		bootstrap, err := ReadBootstrap("http://static.runelite.net/bootstrap.json")
-
-		if err != nil {
-			return err
-		}
-
 		clientArtifact := Artifact{
-			ArtifactId: bootstrap.Client.ArtifactId,
-			GroupId: bootstrap.Client.GroupId,
-			Version: bootstrap.Client.Version,
-			Suffix: "-shaded.jar",
+			ArtifactId: clientBootstrap.Client.ArtifactId,
+			GroupId: clientBootstrap.Client.GroupId,
+			Version: clientBootstrap.Client.Version,
+			Suffix: fmt.Sprintf("-shaded.%s", clientBootstrap.Client.Extension),
 		}
 
 		// Download and unarchive distribution

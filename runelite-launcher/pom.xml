@@ -38,6 +38,10 @@
                         </configuration>
                         <executions>
                             <execution>
+                                <id>default-install</id>
+                                <phase>none</phase>
+                            </execution>
+                            <execution>
                                 <id>get-build-dependencies</id>
                                 <goals>
                                     <goal>get</goal>
@@ -218,6 +222,7 @@
                                 <descriptor>src/assembly/windows32.xml</descriptor>
                                 <descriptor>src/assembly/windows64.xml</descriptor>
                                 <descriptor>src/assembly/darwin.xml</descriptor>
+                                <descriptor>src/assembly/windows32-installer.xml</descriptor>
                             </descriptors>
                         </configuration>
                         <executions>
@@ -284,6 +289,31 @@
                                 <package>github.com/aarzilli/nucular</package>
                             </packages>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.github.github</groupId>
+                <artifactId>site-maven-plugin</artifactId>
+                <version>0.12</version>
+                <configuration>
+                    <message>Executables for ${project.artifactId}-${project.version}</message>
+                    <noJekyll>true</noJekyll>
+                    <merge>true</merge>
+                    <branch>refs/heads/${distribution.static.branch}</branch>
+                    <repositoryName>${distribution.static.name}</repositoryName>
+                    <repositoryOwner>${distribution.static.owner}</repositoryOwner>
+                    <outputDirectory>${project.build.directory}</outputDirectory>
+                    <includes>
+                        <include>${project.artifactId}-${project.version}-*</include>
+                    </includes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>site</goal>
+                        </goals>
+                        <phase>deploy</phase>
                     </execution>
                 </executions>
             </plugin>

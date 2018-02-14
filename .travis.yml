@@ -1,5 +1,5 @@
 sudo: required
-language: go
+language: java
 services:
 - docker
 addons:
@@ -10,7 +10,15 @@ addons:
 install:
 - docker pull karalabe/xgo-latest
 script:
-- mvn clean install -Pcross -q -Dgithub.global.oauth2Token=$GITHUB_OAUTH_TOKEN
+- mvn clean install -Pcross -q
+deploy:
+  provider: script
+  script:
+  - cp .travis.settings.xml $HOME/.m2/settings.xml
+  - mvn deploy -pl runelite-launcher -Pcross -Dgithub.global.oauth2Token=$GITHUB_OAUTH_TOKEN -Dmymavenrepo.write.url=$MYMAVENREPO_WRITE_URL
+  on:
+    tags: true
 env:
   global:
-    secure: eKvwukw/Uk1nZ50ieH1KSn1aNWYysy7jAniv4mttLaFidVxWIABtpJknnqBQCm3+KywOJzIOFsm2D8zhQ/QQbL3lOzxfDytUriyadZbR5aGkIaYuiL1zovRPT+hsHARzdsK+d/Q7NJ7383/LNpsTR1OR1BIyfcNWsQ7ygQGnTbCPysKzxWgxCcObYqSj3pDgE1oeTPCmtg2l6lRl7YhGFJG4oW5YVAkPrv7A54drGtnvoNhOm0R4vSAO1pUigUkHBQtpqS93MB+HtrRD0Ja7TPSfpyzAlsJicNNgFSfjw53Hp19fucSyzncBNRiOd+IGtVAgAgBCgYLEGxX8Fbd28xQwYoLllbH/Vay5WzFJPV88a4uUnQXl/L/yOqu6TBRqm/JGycmXAKNuhlJQjfMdNbJo2OaeGC7yqExdA/fPrA83LzNWoRdVfrryJPbtblQuMnZVKtSW9jYNEu2vH5TYC49oGdHI+83kvV5JcROMeI03b9zmN8P/A9GIzaQGgHGDVIJBJh7tnFlQGdy7BhUQUURaUUoNo+vu4uzBKFA4m8Gl9/fESbaoeN+jZHoB0rIk1sQq025HLPFo3ZJyvM93Vbts+WuG0JNI/zNUc+Nhr5WGUj8UFyCPEjbkrzuuYAIoaRsrXKErTC0TCelocmE5wSc/abx7K4gcbKZovuNz2wo=
+  - secure: eKvwukw/Uk1nZ50ieH1KSn1aNWYysy7jAniv4mttLaFidVxWIABtpJknnqBQCm3+KywOJzIOFsm2D8zhQ/QQbL3lOzxfDytUriyadZbR5aGkIaYuiL1zovRPT+hsHARzdsK+d/Q7NJ7383/LNpsTR1OR1BIyfcNWsQ7ygQGnTbCPysKzxWgxCcObYqSj3pDgE1oeTPCmtg2l6lRl7YhGFJG4oW5YVAkPrv7A54drGtnvoNhOm0R4vSAO1pUigUkHBQtpqS93MB+HtrRD0Ja7TPSfpyzAlsJicNNgFSfjw53Hp19fucSyzncBNRiOd+IGtVAgAgBCgYLEGxX8Fbd28xQwYoLllbH/Vay5WzFJPV88a4uUnQXl/L/yOqu6TBRqm/JGycmXAKNuhlJQjfMdNbJo2OaeGC7yqExdA/fPrA83LzNWoRdVfrryJPbtblQuMnZVKtSW9jYNEu2vH5TYC49oGdHI+83kvV5JcROMeI03b9zmN8P/A9GIzaQGgHGDVIJBJh7tnFlQGdy7BhUQUURaUUoNo+vu4uzBKFA4m8Gl9/fESbaoeN+jZHoB0rIk1sQq025HLPFo3ZJyvM93Vbts+WuG0JNI/zNUc+Nhr5WGUj8UFyCPEjbkrzuuYAIoaRsrXKErTC0TCelocmE5wSc/abx7K4gcbKZovuNz2wo=
+  - secure: G0iwrP/TPMCdEfdBjy6YFEG/3koy/yfK1lOHIpZlph+Pkx5DZJs+8DCDr+sawC40NJtS4MmzPgYkrts0m51/Hov8/1aShOxq7RmOFOZZQWt+AiqDUOHUHBkikDTkyC/RIl6PCvGEXBHlavPqkOqy+2ehkOPQtgSlF3htZdaRV0abCJ+lF83+aqDrf2kJUvEkGJladTQJ1QVMz9yy4VHbQZ3qLXrGui7tp6pcLPzVXC/+k77jDdqMc+I5U7exdCbq08eAHpB/hDJzOBVFmVOoWB99fSiQFjhPzsWBiqvL5ffmvN+2gGvYsOj1LKjwSSXcnDKLtDHn+ZwieI8UGTaB44yY0oX5vN10mlOW9Pq2DkIYDS/swdRroWzJl+WMzj9Q//b7x9kWkwi+JJAjNdW8dMRp2NAnrEEw2y2Wl6y3c8v9jEYq4rdCVbL2PindgzsalcekxV8a2CeETXtMooxSaj61dNX82nkXN4aTbI1+NYiYuAMrb5mClm1tQEba4S5d4YRT/dN8coVsng9uPasvl4fmwn7evJoRmLMs9pB55Etmq3+nXwx54EYhP70xWQWbg32YQH/SPECrYjNZq46xZG1rj3spqO3rjBxVwL5twmaSfKG5SqQDtHGGP9lghQAxRLBhKckarSpyiVTVrDTcag9PC6UsYPEw1bSUpNAft+s=

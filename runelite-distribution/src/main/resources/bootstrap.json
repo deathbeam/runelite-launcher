@@ -1,0 +1,10 @@
+{
+  "client": {
+    "artifactId": "${project.artifactId}",
+    "classifier": "",
+    "extension": "tar.gz",
+    "groupId": "${project.groupId}",
+    "properties": {},
+    "version": "${project.version}"
+  }
+}

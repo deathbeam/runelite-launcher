@@ -10,22 +10,34 @@
         <url>https://github.com/deathbeam/runelite-launcher</url>
         <connection>scm:git:ssh://git@github.com/deathbeam/runelite-launcher.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/deathbeam/runelite-launcher.git</developerConnection>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
 
     <properties>
         <github.global.server>github</github.global.server>
         <go.sdk.version>1.9</go.sdk.version>
         <go.wrapper.plugin.version>2.1.6</go.wrapper.plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Distribution configuration -->
+        <distribution.repository.url>https://mymavenrepo.com/repo/CgtZ79GvmHjHof9FuksV</distribution.repository.url>
+        <distribution.static.owner>deathbeam</distribution.static.owner>
+        <distribution.static.name>runelite-launcher-distribution</distribution.static.name>
+        <distribution.static.branch>master</distribution.static.branch>
+        <distribution.bootstrap.url>
+            https://github.com/${distribution.static.owner}/${distribution.static.name}/raw/${distribution.static.branch}/bootstrap.json
+        </distribution.bootstrap.url>
     </properties>
 
     <distributionManagement>
         <repository>
-            <id>internal.repo</id>
-            <name>Temporary Staging Repository</name>
-            <url>file://${project.build.directory}/mvn-repo</url>
+            <id>myMavenRepo.write</id>
+            <url>${mymavenrepo.write.url}</url>
         </repository>
+        <snapshotRepository>
+            <id>myMavenRepo.write</id>
+            <url>${mymavenrepo.write.url}</url>
+        </snapshotRepository>
     </distributionManagement>
 
     <repositories>
@@ -65,7 +77,7 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.5.3</version>
                 <configuration>
-                    <tagNameFormat>v@{project.version}</tagNameFormat>
+                    <tagNameFormat>@{project.version}</tagNameFormat>
                 </configuration>
             </plugin>
         </plugins>

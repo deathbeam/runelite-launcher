@@ -33,6 +33,7 @@ type Client struct {
 	ArtifactId string `json:"artifactId"`
 	GroupId    string `json:"groupId"`
 	Version    string `json:"version"`
+	Extension  string `json:"extension"`
 }
 
 type Bootstrap struct {
@@ -56,6 +57,11 @@ func ReadBootstrap(url string) (Bootstrap, error) {
 	return bootstrap, nil
 }
 
+type MavenSnapshot struct {
+	TimeStamp string `xml:"timestamp"`
+	BuildNumber string `xml:"buildNumber"`
+}
+
 type MavenVersions struct {
 	Version string `xml:"version"`
 }
@@ -63,6 +69,7 @@ type MavenVersions struct {
 type MavenVersioning struct {
 	Release string `xml:"release"`
 	Versions MavenVersions `xml:"versions"`
+	Snapshot MavenSnapshot `xml:"snapshot"`
 	LastUpdated string `xml:"lastUpdated"`
 }
 
