@@ -3,14 +3,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.runelite.launcher</groupId>
     <artifactId>runelite-launcher-parent</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <scm>
         <url>https://github.com/deathbeam/runelite-launcher</url>
         <connection>scm:git:ssh://git@github.com/deathbeam/runelite-launcher.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/deathbeam/runelite-launcher.git</developerConnection>
-        <tag>0.0.1</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <properties>
