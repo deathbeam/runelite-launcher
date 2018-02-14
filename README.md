@@ -5,9 +5,7 @@
 ## Running
 
 Download runelite-launcher for your platform from the
-[releases page](https://github.com/deathbeam/runelite-launcher/releases)
-or for latest snapshot version, visit
-[distribution repository](https://github.com/deathbeam/runelite-launcher-distribution)
+[releases page](https://github.com/deathbeam/runelite-launcher/releases).
 
 ## Building
 

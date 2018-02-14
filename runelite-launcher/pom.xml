@@ -294,29 +294,31 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>com.github.github</groupId>
-                <artifactId>site-maven-plugin</artifactId>
-                <version>0.12</version>
+                <groupId>de.jutzig</groupId>
+                <artifactId>github-release-plugin</artifactId>
+                <version>1.1.1</version>
                 <configuration>
-                    <message>Executables for ${project.artifactId}-${project.version}</message>
-                    <noJekyll>true</noJekyll>
-                    <merge>true</merge>
-                    <branch>refs/heads/${distribution.static.branch}</branch>
-                    <repositoryName>${distribution.static.name}</repositoryName>
-                    <repositoryOwner>${distribution.static.owner}</repositoryOwner>
-                    <outputDirectory>${project.build.directory}</outputDirectory>
-                    <includes>
-                        <include>${project.artifactId}-${project.version}-*</include>
-                    </includes>
+                    <releaseName>${project.version} Release</releaseName>
+                    <tag>${project.version}</tag>
+                    <fileSets>
+                        <fileSet>
+                            <directory>${project.build.directory}</directory>
+                            <includes>
+                                <include>${project.artifactId}-${project.version}-darwin.zip</include>
+                            </includes>
+                        </fileSet>
+                        <fileSet>
+                            <directory>${project.go.path}/distribution</directory>
+                            <includes>
+                                <include>${project.artifactId}-${project.version}-linux-386</include>
+                                <include>${project.artifactId}-${project.version}-linux-amd64</include>
+                                <include>${project.artifactId}-${project.version}-windows-4.0-386.exe</include>
+                                <include>${project.artifactId}-${project.version}-windows-4.0-amd64.exe</include>
+                                <include>${project.name}.exe</include>
+                            </includes>
+                        </fileSet>
+                    </fileSets>
                 </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>site</goal>
-                        </goals>
-                        <phase>deploy</phase>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
