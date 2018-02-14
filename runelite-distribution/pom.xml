@@ -3,13 +3,13 @@
     <parent>
         <groupId>net.runelite.launcher</groupId>
         <artifactId>runelite-launcher-parent</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.0.1</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>runelite-distribution</artifactId>
     <name>RuneLite Distribution</name>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <packaging>jar</packaging>
 
     <build>
