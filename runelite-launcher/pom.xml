@@ -3,19 +3,19 @@
     <parent>
         <groupId>net.runelite.launcher</groupId>
         <artifactId>runelite-launcher-parent</artifactId>
-        <version>1.0.2-SNAPSHOT</version>
+        <version>0.0.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>runelite-launcher</artifactId>
     <name>RuneLite Launcher</name>
-    <version>0.0.1-SNAPSHOT</version>
     <packaging>mvn-golang</packaging>
 
     <properties>
         <go.home>${project.build.directory}/go</go.home>
         <project.go.path>${go.home}/src/${project.artifactId}</project.go.path>
         <project.resource.directory>${basedir}/src/main/resources</project.resource.directory>
+        <project.installerName>RuneLiteLauncher</project.installerName>
     </properties>
 
     <profiles>
@@ -300,6 +300,7 @@
                 <configuration>
                     <releaseName>${project.version} Release</releaseName>
                     <tag>${project.version}</tag>
+                    <repositoryId>${distribution.launcher.repositoryId}</repositoryId>
                     <fileSets>
                         <fileSet>
                             <directory>${project.build.directory}</directory>
@@ -310,11 +311,11 @@
                         <fileSet>
                             <directory>${project.go.path}/distribution</directory>
                             <includes>
-                                <include>${project.artifactId}-${project.version}-linux-386</include>
-                                <include>${project.artifactId}-${project.version}-linux-amd64</include>
-                                <include>${project.artifactId}-${project.version}-windows-4.0-386.exe</include>
-                                <include>${project.artifactId}-${project.version}-windows-4.0-amd64.exe</include>
-                                <include>${project.name}.exe</include>
+                                <include>${project.artifactId}-linux-386</include>
+                                <include>${project.artifactId}-linux-amd64</include>
+                                <include>${project.artifactId}-windows-4.0-386.exe</include>
+                                <include>${project.artifactId}-windows-4.0-amd64.exe</include>
+                                <include>${project.installerName}.exe</include>
                             </includes>
                         </fileSet>
                     </fileSets>

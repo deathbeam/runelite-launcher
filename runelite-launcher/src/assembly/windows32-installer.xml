@@ -11,7 +11,7 @@
   <files>
     <file>
       <source>
-        ${project.go.path}/distribution/${project.name}.exe
+        ${project.go.path}/distribution/${project.installerName}.exe
       </source>
     </file>
   </files>

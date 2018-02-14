@@ -13,9 +13,8 @@ script:
 - mvn clean install -Pcross -q
 deploy:
   provider: script
-  script:
-  - cp .travis.settings.xml $HOME/.m2/settings.xml
-  - mvn deploy -pl runelite-launcher -Pcross -Dgithub.global.oauth2Token=$GITHUB_OAUTH_TOKEN -Dmymavenrepo.write.url=$MYMAVENREPO_WRITE_URL
+  script: "cp .travis.settings.xml $HOME/.m2/settings.xml && mvn -pl runelite-launcher github-release:release"
+  skip_cleanup: true
   on:
     tags: true
 env:

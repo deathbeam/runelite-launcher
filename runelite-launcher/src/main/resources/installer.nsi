@@ -7,13 +7,14 @@
 ;Defines
   !define PROJECT_FILE "${project.artifactId}-windows-4.0-386.exe"
   !define PROJECT_NAME "${project.name}"
+  !define PROJECT_INSTALLER "${project.installerName}"
 
 ;--------------------------------
 ;General
 
   ;Name and file
   Name "%${PROJECT_NAME}"
-  OutFile "%${PROJECT_NAME}.exe"
+  OutFile "%${PROJECT_INSTALLER}.exe"
 
   ;Default installation folder
   InstallDir "$LOCALAPPDATA\%${PROJECT_NAME}"

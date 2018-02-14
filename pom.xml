@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.runelite.launcher</groupId>
     <artifactId>runelite-launcher-parent</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <scm>
@@ -27,6 +27,7 @@
         <distribution.bootstrap.url>
             https://github.com/${distribution.static.owner}/${distribution.static.name}/raw/${distribution.static.branch}/bootstrap.json
         </distribution.bootstrap.url>
+        <distribution.launcher.repositoryId>deathbeam/runelite-launcher</distribution.launcher.repositoryId>
     </properties>
 
     <distributionManagement>

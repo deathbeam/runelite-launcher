@@ -5,7 +5,7 @@
     <servers>
         <server>
             <id>github</id>
-            <privateKey>${env.$GITHUB_OAUTH_TOKEN}</privateKey>
+            <privateKey>${env.GITHUB_OAUTH_TOKEN}</privateKey>
         </server>
     </servers>
 </settings>
