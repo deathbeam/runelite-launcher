@@ -27,7 +27,7 @@ package main
 import (
 	"bytes"
 	"github.com/cavaliercoder/grab"
-	"github.com/mholt/archiver"
+	"github.com/verybluebot/tarinator-go"
 	"io"
 	"net/http"
 	"os"
@@ -112,7 +112,7 @@ Loop:
 func ExtractFile(file string, dest string) error {
 	logger.LogLine("Extracting %v...", file)
 
-	if err := archiver.TarGz.Open(file, dest); err != nil {
+	if err := tarinator.UnTarinate(dest, file); err != nil {
 		return err
 	}
 

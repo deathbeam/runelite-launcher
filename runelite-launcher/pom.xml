@@ -14,12 +14,19 @@
     <properties>
         <go.home>${project.build.directory}/go</go.home>
         <project.go.path>${go.home}/src/${project.artifactId}</project.go.path>
+        <project.resource.directory>${basedir}/src/main/resources</project.resource.directory>
     </properties>
 
     <profiles>
         <profile>
             <id>cross</id>
             <build>
+                <resources>
+                    <resource>
+                        <directory>${project.resource.directory}</directory>
+                        <filtering>true</filtering>
+                    </resource>
+                </resources>
                 <plugins>
                     <plugin>
                         <groupId>com.igormaznitsa</groupId>
@@ -111,7 +118,37 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-resources-plugin</artifactId>
                         <version>3.0.2</version>
+                        <configuration>
+                            <escapeString>%</escapeString>
+                        </configuration>
                         <executions>
+                            <execution>
+                                <id>copy-installer-resources</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.go.path}/distribution</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${project.resource.directory}</directory>
+                                            <includes>
+                                                <include>installer.nsi</include>
+                                                <include>license.txt</include>
+                                            </includes>
+                                            <filtering>true</filtering>
+                                        </resource>
+                                        <resource>
+                                            <directory>${project.resource.directory}</directory>
+                                            <includes>
+                                                <include>runelite.ico</include>
+                                            </includes>
+                                            <filtering>false</filtering>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
                             <execution>
                                 <id>copy-darwin-plist</id>
                                 <phase>compile</phase>
@@ -122,7 +159,7 @@
                                     <outputDirectory>${project.go.path}/distribution/${project.name}.app/Contents</outputDirectory>
                                     <resources>
                                         <resource>
-                                            <directory>src/main/resources</directory>
+                                            <directory>${project.resource.directory}</directory>
                                             <includes>
                                                 <include>Info.plist</include>
                                             </includes>
@@ -141,12 +178,32 @@
                                     <outputDirectory>${project.go.path}/distribution/${project.name}.app/Contents/Resources</outputDirectory>
                                     <resources>
                                         <resource>
-                                            <directory>src/main/resources</directory>
+                                            <directory>${project.resource.directory}</directory>
                                             <includes>
                                                 <include>runelite.icns</include>
                                             </includes>
                                         </resource>
                                     </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.6.0</version>
+                        <executions>
+                            <execution>
+                                <id>installer</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>makensis</executable>
+                                    <arguments>
+                                        <argument>${project.go.path}/distribution/installer.nsi</argument>
+                                    </arguments>
                                 </configuration>
                             </execution>
                         </executions>
@@ -180,7 +237,7 @@
 
     <build>
         <defaultGoal>clean package</defaultGoal>
-        <sourceDirectory>${basedir}/src/main/go</sourceDirectory>
+        <sourceDirectory>src/main/go</sourceDirectory>
         <plugins>
             <plugin>
                 <groupId>com.igormaznitsa</groupId>
@@ -222,7 +279,7 @@
                             <goVersion>${go.sdk.version}</goVersion>
                             <packages>
                                 <package>github.com/mitchellh/go-homedir</package>
-                                <package>github.com/mholt/archiver</package>
+                                <package>github.com/verybluebot/tarinator-go</package>
                                 <package>github.com/cavaliercoder/grab</package>
                                 <package>github.com/aarzilli/nucular</package>
                             </packages>
