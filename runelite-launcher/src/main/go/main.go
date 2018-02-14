@@ -25,6 +25,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/mitchellh/go-homedir"
 	"os"
@@ -35,6 +36,18 @@ import (
 )
 
 func main() {
+	// Setup CLI flags
+	var flagVersion string
+	var flagDebug bool
+
+	flag.BoolVar(&flagDebug, "debug", false,
+		"Enables debug logging on the RuneLite client")
+
+	flag.StringVar(&flagVersion, "version", "",
+		"Forces the launcher to download specific version of RuneLite client")
+
+	flag.Parse()
+
 	// Setup cache directories
 	home, err := homedir.Dir()
 
@@ -53,8 +66,14 @@ func main() {
 	}
 
 	run := func(path string) error {
+		var args []string
+
+		if flagDebug {
+			args = []string{"--debug"}
+		}
+
 		logger.LogLine("Launching %v...", path)
-		cmd := exec.Command(path)
+		cmd := exec.Command(path, args...)
 		cmd.Stdin = os.Stdin
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
@@ -118,6 +137,11 @@ func main() {
 			GroupId: clientBootstrap.Client.GroupId,
 			Version: clientBootstrap.Client.Version,
 			Suffix: fmt.Sprintf("-shaded.%s", clientBootstrap.Client.Extension),
+		}
+
+		// Force set the client version if set from CLI
+		if flagVersion != "" {
+			clientArtifact.Version = flagVersion
 		}
 
 		// Download and unarchive distribution

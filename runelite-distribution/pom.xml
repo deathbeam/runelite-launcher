@@ -111,7 +111,7 @@
                             <mainClass>com.badlogicgames.packr.Packr</mainClass>
                             <arguments>
                                 <argument>--minimizejre</argument>
-                                <argument>hard</argument>
+                                <argument>soft</argument>
                                 <argument>--platform</argument>
                                 <argument>linux32</argument>
                                 <argument>--jdk</argument>
@@ -148,7 +148,7 @@
                             <mainClass>com.badlogicgames.packr.Packr</mainClass>
                             <arguments>
                                 <argument>--minimizejre</argument>
-                                <argument>hard</argument>
+                                <argument>soft</argument>
                                 <argument>--platform</argument>
                                 <argument>linux64</argument>
                                 <argument>--jdk</argument>
@@ -185,7 +185,7 @@
                             <mainClass>com.badlogicgames.packr.Packr</mainClass>
                             <arguments>
                                 <argument>--minimizejre</argument>
-                                <argument>hard</argument>
+                                <argument>soft</argument>
                                 <argument>--platform</argument>
                                 <argument>windows32</argument>
                                 <argument>--jdk</argument>
@@ -222,7 +222,7 @@
                             <mainClass>com.badlogicgames.packr.Packr</mainClass>
                             <arguments>
                                 <argument>--minimizejre</argument>
-                                <argument>hard</argument>
+                                <argument>soft</argument>
                                 <argument>--platform</argument>
                                 <argument>windows64</argument>
                                 <argument>--jdk</argument>
@@ -259,7 +259,7 @@
                             <mainClass>com.badlogicgames.packr.Packr</mainClass>
                             <arguments>
                                 <argument>--minimizejre</argument>
-                                <argument>hard</argument>
+                                <argument>soft</argument>
                                 <argument>--platform</argument>
                                 <argument>mac</argument>
                                 <argument>--icon</argument>
