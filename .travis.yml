@@ -6,6 +6,7 @@ addons:
   apt:
     packages:
     - maven
+    - nsis
 install:
 - docker pull karalabe/xgo-latest
 script:
