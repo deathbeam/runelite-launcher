@@ -12,8 +12,7 @@
     <packaging>mvn-golang</packaging>
 
     <properties>
-        <go.home>${project.build.directory}/go</go.home>
-        <project.go.path>${go.home}/src/${project.artifactId}</project.go.path>
+        <project.go.path>${project.build.directory}/src/${project.artifactId}/src</project.go.path>
         <project.resource.directory>${basedir}/src/main/resources</project.resource.directory>
         <project.installerName>RuneLiteLauncher</project.installerName>
     </properties>
@@ -34,8 +33,11 @@
                         <artifactId>mvn-golang-wrapper</artifactId>
                         <configuration>
                             <goVersion>${go.sdk.version}</goVersion>
+                            <addToGoPath>
+                                <addToGoPath>${project.build.directory}</addToGoPath>
+                            </addToGoPath>
+                            <enforceGoPathToEnd>true</enforceGoPathToEnd>
                             <command />
-                            <goPath>${go.home}</goPath>
                         </configuration>
                         <executions>
                             <execution>
