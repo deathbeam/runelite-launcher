@@ -59,12 +59,7 @@ func main() {
 	launcherCache := path.Join(runeliteHome, "cache")
 	distributionCache := path.Join(launcherCache, "RuneLite")
 
-	if !FileExists(launcherCache) {
-		if err := os.MkdirAll(launcherCache, os.ModePerm); err != nil {
-			panic(err)
-		}
-	}
-
+	// Execute command and pass arguments passed to application to it
 	run := func(path string) error {
 		var args []string
 
@@ -183,6 +178,8 @@ func main() {
 		return nil
 	}
 
+	// Attempt to repeat the boot process 3 times in case it throws and error, on 4th attempt close the
+	// application
 	safeBoot := func() {
 		const maxRetries = 3
 
@@ -201,7 +198,7 @@ func main() {
 			}
 
 			logger.LogLine("Cleaning cache and retrying (%d of %d)...", i, maxRetries)
-			os.RemoveAll(launcherCache)
+			os.RemoveAll(distributionCache)
 		}
 	}
 

@@ -72,25 +72,21 @@ func FetchFile(url string) ([]byte, error) {
 		return []byte{}, err
 	}
 
+	defer resp.Body.Close()
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(resp.Body)
-
-	if err = resp.Body.Close(); err != nil {
-		return []byte{}, err
-	}
-
 	return buf.Bytes(), nil
 }
 
-func DownloadFile(url string, dest string) error {
+func DownloadFile(url string, dest string, checksum []byte, checksumHash hash.Hash) error {
 	// create client
 	client := grab.NewClient()
 	req, _ := grab.NewRequest(dest, url)
+	req.SetChecksum(checksumHash, checksum, true)
 
 	// start download
 	logger.LogLine("Downloading %v...", req.URL())
 	resp := client.Do(req)
-	logger.LogLine("%v", resp.HTTPResponse.Status)
 
 	// start UI loop
 	t := time.NewTicker(500 * time.Millisecond)
@@ -135,21 +131,17 @@ func CopyFile(file string, dest string) error {
 		return err
 	}
 
+	defer in.Close()
+
 	out, err := os.Create(dest)
 
 	if err != nil {
 		return err
 	}
 
+	defer out.Close()
+
 	if _, err = io.Copy(out, in); err != nil {
-		return err
-	}
-
-	if err = in.Close(); err != nil {
-		return err
-	}
-
-	if err = out.Close(); err != nil {
 		return err
 	}
 

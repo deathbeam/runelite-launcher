@@ -40,14 +40,12 @@ func CreateUI(boot func()) {
 	const scaling = 1
 	const windowWidth = 640
 	const windowHeight = 300
-	const windowFlags = nucular.WindowBorder |
-		nucular.WindowMovable |
-		nucular.WindowTitle |
-		nucular.WindowClosable
+	const windowFlags = nucular.WindowTitle | nucular.WindowClosable
 
 	var lines []string
 	var curProgress int
 
+	// Wraps words on specified column based on word delimiters
 	wordWrap := func(text string, lineWidth int) []string {
 		words := strings.Fields(strings.TrimSpace(text))
 
