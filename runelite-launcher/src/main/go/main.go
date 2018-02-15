@@ -108,15 +108,15 @@ func main() {
 
 		// Create distribution repository and distribution artifact
 		distributionRepository := Repository{
-			Url: "/*$mvn.project.property.distribution.repository.url$*/",
+			Url:       "/*$mvn.project.property.distribution.repository.url$*/",
 			LocalPath: launcherCache,
 		}
 
 		distributionArtifact := Artifact{
 			ArtifactId: distributionBootstrap.Client.ArtifactId,
-			GroupId: distributionBootstrap.Client.GroupId,
-			Version: distributionBootstrap.Client.Version,
-			Suffix: fmt.Sprintf("-%s.%s", systemName, distributionBootstrap.Client.Extension),
+			GroupId:    distributionBootstrap.Client.GroupId,
+			Version:    distributionBootstrap.Client.Version,
+			Suffix:     fmt.Sprintf("-%s.%s", systemName, distributionBootstrap.Client.Extension),
 		}
 
 		// Parse client bootstrap properties
@@ -128,15 +128,15 @@ func main() {
 
 		// Create runelite repository and client artifact
 		clientRepository := Repository{
-			Url: "https://repo.runelite.net",
+			Url:       "https://repo.runelite.net",
 			LocalPath: launcherCache,
 		}
 
 		clientArtifact := Artifact{
 			ArtifactId: clientBootstrap.Client.ArtifactId,
-			GroupId: clientBootstrap.Client.GroupId,
-			Version: clientBootstrap.Client.Version,
-			Suffix: fmt.Sprintf("-shaded.%s", clientBootstrap.Client.Extension),
+			GroupId:    clientBootstrap.Client.GroupId,
+			Version:    clientBootstrap.Client.Version,
+			Suffix:     fmt.Sprintf("-shaded.%s", clientBootstrap.Client.Extension),
 		}
 
 		// Force set the client version if set from CLI
@@ -171,7 +171,7 @@ func main() {
 		if systemName == "darwin" {
 			distributionExecutablePath = path.Join(distributionExecutablePath, "Contents", "MacOS", distributionArtifact.ArtifactId)
 		} else if strings.Contains(systemName, "windows") {
-			distributionExecutablePath = path.Join(distributionExecutablePath, distributionArtifact.ArtifactId + ".exe")
+			distributionExecutablePath = path.Join(distributionExecutablePath, distributionArtifact.ArtifactId+".exe")
 		} else {
 			distributionExecutablePath = path.Join(distributionExecutablePath, distributionArtifact.ArtifactId)
 		}

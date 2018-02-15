@@ -26,8 +26,11 @@ package main
 
 import (
 	"bytes"
+	"crypto/md5"
+	"encoding/hex"
 	"github.com/cavaliercoder/grab"
 	"github.com/verybluebot/tarinator-go"
+	"hash"
 	"io"
 	"net/http"
 	"os"
@@ -51,7 +54,9 @@ func CompareFiles(left string, right string) bool {
 		return false
 	}
 
-	return leftFile.IsDir() || rightFile.IsDir() || leftFile.Size() == rightFile.Size()
+	return leftFile.IsDir() || rightFile.IsDir() ||
+		leftFile.Size() == rightFile.Size() ||
+		bytes.Compare(CalculateCheckSum(left, md5.New()), CalculateCheckSum(right, md5.New())) == 0
 }
 
 func FileExists(name string) bool {
@@ -60,6 +65,7 @@ func FileExists(name string) bool {
 }
 
 func FetchFile(url string) ([]byte, error) {
+	logger.LogLine("Reading %v...", url)
 	resp, err := http.Get(url)
 
 	if err != nil {
@@ -149,4 +155,26 @@ func CopyFile(file string, dest string) error {
 
 	logger.LogLine("File copied to %v", dest)
 	return nil
+}
+
+func CalculateCheckSum(file string, hash hash.Hash) []byte {
+	logger.LogLine("Calculating checksum of %v...", file)
+	f, err := os.Open(file)
+	var result []byte
+
+	if err != nil {
+		return result
+	}
+
+	defer f.Close()
+
+	h := hash
+	if _, err := io.Copy(h, f); err != nil {
+		return result
+	}
+
+	sum := h.Sum(nil)
+	result = make([]byte, hex.EncodedLen(len(sum)))
+	hex.Encode(result, sum)
+	return result
 }

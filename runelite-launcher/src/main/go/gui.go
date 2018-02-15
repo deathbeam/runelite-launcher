@@ -34,7 +34,7 @@ import (
 )
 
 func CreateUI(boot func()) {
-	const title  = "/*$mvn.project.name$*/ /*$mvn.project.version$*/"
+	const title = "/*$mvn.project.name$*/ /*$mvn.project.version$*/"
 	const lineSize = 16
 	const theme = style.DefaultTheme
 	const scaling = 1
@@ -48,12 +48,11 @@ func CreateUI(boot func()) {
 	var lines []string
 	var curProgress int
 
-
 	wordWrap := func(text string, lineWidth int) []string {
 		words := strings.Fields(strings.TrimSpace(text))
 
 		if len(words) == 0 {
-			return []string{ text }
+			return []string{text}
 		}
 
 		wrapped := words[0]
@@ -80,9 +79,9 @@ func CreateUI(boot func()) {
 			window.Progress(&curProgress, 100, false)
 			linesLen := len(lines)
 
-			for i := range lines  {
-				line := "> " + lines[linesLen - 1 - i]
-				wrappedLines := wordWrap(line, window.Bounds.W / 7 - 2)
+			for i := range lines {
+				line := "> " + lines[linesLen-1-i]
+				wrappedLines := wordWrap(line, window.Bounds.W/7-2)
 				window.Row(2).Dynamic(1)
 
 				for _, wrappedLine := range wrappedLines {
@@ -97,13 +96,13 @@ func CreateUI(boot func()) {
 
 	// Create custom GUI logger
 	guiLogger := Logger{
-		LogLine: func (format string, a ...interface{}) {
+		LogLine: func(format string, a ...interface{}) {
 			defaultLogger.LogLine(format, a...)
 			formatted := fmt.Sprintf(format, a...)
 			lines = append(lines, formatted)
 			window.Changed()
 		},
-		UpdateProgress: func (value int) {
+		UpdateProgress: func(value int) {
 			curProgress = value
 			window.Changed()
 		},

@@ -41,7 +41,6 @@ type Bootstrap struct {
 }
 
 func ReadBootstrap(url string) (Bootstrap, error) {
-	logger.LogLine("Reading %v...", url)
 	var bootstrap Bootstrap
 
 	file, err := FetchFile(url)
@@ -58,7 +57,7 @@ func ReadBootstrap(url string) (Bootstrap, error) {
 }
 
 type MavenSnapshot struct {
-	TimeStamp string `xml:"timestamp"`
+	TimeStamp   string `xml:"timestamp"`
 	BuildNumber string `xml:"buildNumber"`
 }
 
@@ -67,20 +66,19 @@ type MavenVersions struct {
 }
 
 type MavenVersioning struct {
-	Release string `xml:"release"`
-	Versions MavenVersions `xml:"versions"`
-	Snapshot MavenSnapshot `xml:"snapshot"`
-	LastUpdated string `xml:"lastUpdated"`
+	Release     string        `xml:"release"`
+	Versions    MavenVersions `xml:"versions"`
+	Snapshot    MavenSnapshot `xml:"snapshot"`
+	LastUpdated string        `xml:"lastUpdated"`
 }
 
 type MavenMetadata struct {
-	ArtifactId string `xml:"artifactId"`
-	GroupId string `xml:"groupId"`
+	ArtifactId string          `xml:"artifactId"`
+	GroupId    string          `xml:"groupId"`
 	Versioning MavenVersioning `xml:"versioning"`
 }
 
 func ReadMavenMetadata(url string) (MavenMetadata, error) {
-	logger.LogLine("Reading %v...", url)
 	var mavenMetadata MavenMetadata
 
 	file, err := FetchFile(url)

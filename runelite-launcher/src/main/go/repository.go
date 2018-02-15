@@ -25,84 +25,98 @@
 package main
 
 import (
-  "fmt"
-  "os"
-  "path"
-  "strings"
+	"bytes"
+	"crypto/md5"
+	"fmt"
+	"github.com/pkg/errors"
+	"os"
+	"path"
+	"strings"
 )
 
 type Artifact struct {
-  ArtifactId string
-  GroupId string
-  Version string
-  Suffix string
+	ArtifactId string
+	GroupId    string
+	Version    string
+	Suffix     string
 }
 
 type Repository struct {
-  Url string
-  LocalPath string
+	Url       string
+	LocalPath string
 }
 
 func DownloadArtifact(artifact Artifact, repository Repository) (string, bool, error) {
 
-  groupPath := strings.Replace(artifact.GroupId, ".", "/", -1)
-  artifactVersion := artifact.Version
-  artifactRepoUrl := fmt.Sprintf("%s/%s/%s", repository.Url, groupPath, artifact.ArtifactId)
-  artifactRepoVersionedUrl := fmt.Sprintf("%s/%s", artifactRepoUrl, artifactVersion)
+	groupPath := strings.Replace(artifact.GroupId, ".", "/", -1)
+	artifactVersion := artifact.Version
+	artifactRepoUrl := fmt.Sprintf("%s/%s/%s", repository.Url, groupPath, artifact.ArtifactId)
+	artifactRepoVersionedUrl := fmt.Sprintf("%s/%s", artifactRepoUrl, artifactVersion)
 
-  if strings.Contains(artifactVersion, "SNAPSHOT") {
-    mavenMetadata, err := ReadMavenMetadata(artifactRepoVersionedUrl + "/maven-metadata.xml")
+	if strings.Contains(artifactVersion, "SNAPSHOT") {
+		mavenMetadata, err := ReadMavenMetadata(artifactRepoVersionedUrl + "/maven-metadata.xml")
 
-    if err != nil {
-      return "", false, err
-    }
+		if err != nil {
+			return "", false, err
+		}
 
-    snapshotMetadata := mavenMetadata.Versioning.Snapshot
-    artifactVersion = strings.Replace(artifactVersion, "SNAPSHOT", "", 1) +
-      snapshotMetadata.TimeStamp + "-" + snapshotMetadata.BuildNumber
-  }
+		snapshotMetadata := mavenMetadata.Versioning.Snapshot
+		artifactVersion = strings.Replace(artifactVersion, "SNAPSHOT", "", 1) +
+			snapshotMetadata.TimeStamp + "-" + snapshotMetadata.BuildNumber
+	}
 
-  artifactName := fmt.Sprintf("%s-%s%s", artifact.ArtifactId, artifactVersion, artifact.Suffix)
-  artifactUrl := fmt.Sprintf("%s/%s", artifactRepoVersionedUrl, artifactName)
+	artifactName := fmt.Sprintf("%s-%s%s", artifact.ArtifactId, artifactVersion, artifact.Suffix)
+	artifactUrl := fmt.Sprintf("%s/%s", artifactRepoVersionedUrl, artifactName)
 
-  artifactDestination := path.Join(repository.LocalPath, artifactName)
-  changed := false
+	artifactDestination := path.Join(repository.LocalPath, artifactName)
+	changed := false
+	checkSumUrl := fmt.Sprintf("%s.%s", artifactUrl, "md5")
+	checkSum, err := FetchFile(checkSumUrl)
 
-  if !FileExists(artifactDestination) {
-    changed = true
+	if err != nil {
+		return artifactDestination, false, err
+	}
 
-    if err := DownloadFile(artifactUrl, artifactDestination); err != nil {
-      return artifactDestination, changed, err
-    }
-  }
+	if !FileExists(artifactDestination) || bytes.Compare(CalculateCheckSum(artifactDestination, md5.New()), checkSum) != 0 {
+		os.RemoveAll(artifactDestination)
+		changed = true
 
-  return artifactDestination, changed, nil
+		if err := DownloadFile(artifactUrl, artifactDestination); err != nil {
+			return artifactDestination, changed, err
+		}
+
+		if bytes.Compare(CalculateCheckSum(artifactDestination, md5.New()), checkSum) != 0 {
+			return artifactDestination, changed, errors.New("Failed to verify checksum for " + artifactDestination)
+		}
+	}
+
+	return artifactDestination, changed, nil
 }
 
 func ProcessArtifact(artifact Artifact, repository Repository, cache string) error {
-  // Download artifact
-  artifactPath, artifactChanged, err := DownloadArtifact(artifact, repository)
+	// Download artifact
+	artifactPath, artifactChanged, err := DownloadArtifact(artifact, repository)
 
-  if err != nil {
-    return err
-  }
+	if err != nil {
+		return err
+	}
 
-  if artifactChanged || !CompareFiles(artifactPath, cache) {
-    if strings.Contains(artifactPath, ".tar") {
-      // Extract artifact if it is .tar*
-      os.RemoveAll(cache)
-      os.MkdirAll(cache, os.ModePerm)
+	if artifactChanged || !CompareFiles(artifactPath, cache) {
+		if strings.Contains(artifactPath, ".tar") {
+			// Extract artifact if it is .tar*
+			os.RemoveAll(cache)
+			os.MkdirAll(cache, os.ModePerm)
 
-      if err = ExtractFile(artifactPath, cache); err != nil {
-        return err
-      }
-    } else {
-      // Replace artifact with new one
-      if err = CopyFile(artifactPath, cache); err != nil {
-        return err
-      }
-    }
-  }
+			if err = ExtractFile(artifactPath, cache); err != nil {
+				return err
+			}
+		} else {
+			// Replace artifact with new one
+			if err = CopyFile(artifactPath, cache); err != nil {
+				return err
+			}
+		}
+	}
 
-  return nil
+	return nil
 }

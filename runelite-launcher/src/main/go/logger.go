@@ -27,18 +27,18 @@ package main
 import "log"
 
 type Logger struct {
-  LogLine func(format string, a ...interface{})
-  UpdateProgress func(progress int)
+	LogLine        func(format string, a ...interface{})
+	UpdateProgress func(progress int)
 }
 
 // Create default implementation of logger
 var defaultLogger = Logger{
-  LogLine: func(format string, a ...interface{}) {
-    log.Printf(format + "\n", a...)
-  },
-  UpdateProgress: func(progress int) {
-    log.Printf("Progress is %d%%\n", progress)
-  },
+	LogLine: func(format string, a ...interface{}) {
+		log.Printf(format+"\n", a...)
+	},
+	UpdateProgress: func(progress int) {
+		log.Printf("Progress is %d%%\n", progress)
+	},
 }
 
 var logger = defaultLogger
