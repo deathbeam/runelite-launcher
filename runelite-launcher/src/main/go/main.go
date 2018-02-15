@@ -128,7 +128,7 @@ func main() {
 
 		// Create runelite repository and client artifact
 		clientRepository := Repository{
-			Url: "http://repo.runelite.net",
+			Url: "https://repo.runelite.net",
 			LocalPath: launcherCache,
 		}
 
