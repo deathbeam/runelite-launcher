@@ -1,5 +1,7 @@
 # runelite-launcher
 
+[![](https://jitpack.io/v/deathbeam/runelite-launcher.svg)](https://jitpack.io/#deathbeam/runelite-launcher)
+
 ![clean](https://i.imgur.com/HchTzSG.png)
 
 ## Running
