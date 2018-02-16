@@ -1,0 +1,10 @@
+{
+  "client": {
+    "artifactId": "runelite-distribution",
+    "classifier": "",
+    "extension": "tar.gz",
+    "groupId": "com.github.deathbeam.runelite-launcher",
+    "properties": {},
+    "version": "0.0.2"
+  }
+}
