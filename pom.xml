@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>net.runelite.launcher</groupId>
+    <groupId>com.github.deathbeam.runelite-launcher</groupId>
     <artifactId>runelite-launcher-parent</artifactId>
     <version>0.0.3-SNAPSHOT</version>
     <packaging>pom</packaging>
@@ -20,26 +20,17 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- Distribution configuration -->
-        <distribution.repository.url>https://mymavenrepo.com/repo/CgtZ79GvmHjHof9FuksV</distribution.repository.url>
+        <distribution.repository.url>https://jitpack.io</distribution.repository.url>
         <distribution.static.owner>deathbeam</distribution.static.owner>
-        <distribution.static.name>runelite-launcher-distribution</distribution.static.name>
-        <distribution.static.branch>master</distribution.static.branch>
+        <distribution.static.name>runelite-launcher</distribution.static.name>
+        <distribution.static.branch>gh-pages</distribution.static.branch>
         <distribution.bootstrap.url>
             https://github.com/${distribution.static.owner}/${distribution.static.name}/raw/${distribution.static.branch}/bootstrap.json
         </distribution.bootstrap.url>
-        <distribution.launcher.repositoryId>deathbeam/runelite-launcher</distribution.launcher.repositoryId>
+        <distribution.launcher.repositoryId>
+            ${distribution.static.owner}/${distribution.static.name}
+        </distribution.launcher.repositoryId>
     </properties>
-
-    <distributionManagement>
-        <repository>
-            <id>myMavenRepo.write</id>
-            <url>${mymavenrepo.write.url}</url>
-        </repository>
-        <snapshotRepository>
-            <id>myMavenRepo.write</id>
-            <url>${mymavenrepo.write.url}</url>
-        </snapshotRepository>
-    </distributionManagement>
 
     <repositories>
         <repository>
@@ -55,10 +46,6 @@
         <pluginRepository>
             <id>maven-central-plugins</id>
             <url>http://repo1.maven.org/maven2</url>
-        </pluginRepository>
-        <pluginRepository>
-            <id>sonatype-public-repository</id>
-            <url>https://oss.sonatype.org/content/groups/public</url>
         </pluginRepository>
         <pluginRepository>
             <id>jitpack.io</id>

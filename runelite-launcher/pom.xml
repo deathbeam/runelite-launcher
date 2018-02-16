@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
-        <groupId>net.runelite.launcher</groupId>
+        <groupId>com.github.deathbeam.runelite-launcher</groupId>
         <artifactId>runelite-launcher-parent</artifactId>
         <version>0.0.3-SNAPSHOT</version>
     </parent>
@@ -14,7 +14,7 @@
     <properties>
         <project.go.path>${project.build.directory}/src/${project.artifactId}/src</project.go.path>
         <project.resource.directory>${basedir}/src/main/resources</project.resource.directory>
-        <project.installerName>RuneLiteLauncher</project.installerName>
+        <installerName>RuneLiteLauncherInstaller</installerName>
     </properties>
 
     <profiles>
@@ -317,7 +317,7 @@
                                 <include>${project.artifactId}-linux-amd64</include>
                                 <include>${project.artifactId}-windows-4.0-386.exe</include>
                                 <include>${project.artifactId}-windows-4.0-amd64.exe</include>
-                                <include>${project.installerName}.exe</include>
+                                <include>${installerName}.exe</include>
                             </includes>
                         </fileSet>
                     </fileSets>
