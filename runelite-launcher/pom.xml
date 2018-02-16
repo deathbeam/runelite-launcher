@@ -14,7 +14,7 @@
     <properties>
         <project.go.path>${project.build.directory}/src/${project.artifactId}/src</project.go.path>
         <project.resource.directory>${basedir}/src/main/resources</project.resource.directory>
-        <installerName>RuneLiteLauncherInstaller</installerName>
+        <project.installerName>RuneLiteLauncherInstaller</project.installerName>
     </properties>
 
     <profiles>
@@ -317,7 +317,7 @@
                                 <include>${project.artifactId}-linux-amd64</include>
                                 <include>${project.artifactId}-windows-4.0-386.exe</include>
                                 <include>${project.artifactId}-windows-4.0-amd64.exe</include>
-                                <include>${installerName}.exe</include>
+                                <include>${project.installerName}.exe</include>
                             </includes>
                         </fileSet>
                     </fileSets>
