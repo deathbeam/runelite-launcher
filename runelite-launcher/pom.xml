@@ -290,6 +290,7 @@
                                 <package>github.com/verybluebot/tarinator-go</package>
                                 <package>github.com/cavaliercoder/grab</package>
                                 <package>github.com/aarzilli/nucular</package>
+                                <package>github.com/blang/semver</package>
                             </packages>
                         </configuration>
                     </execution>

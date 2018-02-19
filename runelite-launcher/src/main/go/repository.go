@@ -33,6 +33,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"github.com/blang/semver"
 )
 
 type Artifact struct {
@@ -125,6 +126,32 @@ func ReadMavenCheckSum(url string) ([]byte, error) {
 	decodedCheckSum := make([]byte, hex.DecodedLen(len(checkSum)))
 	hex.Decode(decodedCheckSum, checkSum)
 	return decodedCheckSum, nil
+}
+
+// Create next snapshot version from version
+func CreateSnapshotVersion(version string) (string, error) {
+	parsedVersion, err := semver.Make(version)
+
+	if err != nil {
+		return version, err
+	}
+
+	parsedVersion.Patch += 1
+	prVersion, err := semver.NewPRVersion("SNAPSHOT")
+
+	if err != nil {
+		return version, err
+	}
+
+	parsedVersion.Pre = []semver.PRVersion{ prVersion }
+
+	if err = parsedVersion.Validate(); err != nil {
+		return version, err
+	}
+
+	finalVersion := parsedVersion.String()
+	logger.LogLine("Built snapshot version %v", finalVersion)
+	return finalVersion, nil
 }
 
 func DownloadArtifact(artifact Artifact, repository Repository) (string, error) {

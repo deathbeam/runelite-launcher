@@ -44,7 +44,7 @@ func main() {
 		"Enables debug logging on the RuneLite client")
 
 	flag.StringVar(&flagVersion, "version", "",
-		"Forces the launcher to download specific version of RuneLite client")
+		"Forces the launcher to download specific version of RuneLite client (use 'next' for latest snapshot build")
 
 	flag.Parse()
 
@@ -136,6 +136,13 @@ func main() {
 
 		// Force set the client version if set from CLI
 		if flagVersion != "" {
+			// If client version is "next" build next snapshot version
+			if flagVersion == "next" {
+				if nextVersion, err := CreateSnapshotVersion(clientArtifact.Version); err != nil {
+					flagVersion = nextVersion
+				}
+			}
+
 			clientArtifact.Version = flagVersion
 		}
 
