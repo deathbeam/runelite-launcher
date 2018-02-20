@@ -35,24 +35,37 @@ import (
 	"strings"
 )
 
+const projectName = "/*$mvn.project.name$*/"
+const projectVersion = "/*$mvn.project.version$*/"
+
 func main() {
 	// Setup CLI flags
-	var flagVersion string
+	var flagClientVersion string
 	var flagDebug bool
+	var flagShowVersion bool
 
 	flag.BoolVar(&flagDebug, "debug", false,
 		"Enables debug logging on the RuneLite client")
 
-	flag.StringVar(&flagVersion, "version", "",
+	flag.BoolVar(&flagShowVersion, "version", false,
+		"Prints launcher version and exits.")
+
+	flag.StringVar(&flagClientVersion, "use-version", "",
 		"Forces the launcher to download specific version of RuneLite client (use 'next' for latest snapshot build")
 
 	flag.Parse()
+
+	if flagShowVersion {
+		fmt.Printf("%v %v", projectName, projectVersion)
+		return
+	}
 
 	// Setup cache directories
 	home, err := homedir.Dir()
 
 	if err != nil {
-		panic(err)
+		logger.LogLine("Unexpected error occurred while getting home directory: %v", err)
+		return
 	}
 
 	runeliteHome := path.Join(home, ".runelite")
@@ -135,15 +148,15 @@ func main() {
 		}
 
 		// Force set the client version if set from CLI
-		if flagVersion != "" {
+		if flagClientVersion != "" {
 			// If client version is "next" build next snapshot version
-			if flagVersion == "next" {
+			if flagClientVersion == "next" {
 				if nextVersion, err := CreateSnapshotVersion(clientArtifact.Version); err != nil {
-					flagVersion = nextVersion
+					flagClientVersion = nextVersion
 				}
 			}
 
-			clientArtifact.Version = flagVersion
+			clientArtifact.Version = flagClientVersion
 		}
 
 		// Download and unarchive distribution
