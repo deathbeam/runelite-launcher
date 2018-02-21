@@ -24,7 +24,24 @@
  */
 package main
 
-import "log"
+import (
+	"github.com/sirupsen/logrus"
+	"os"
+	"path"
+)
+
+var consoleLog = logrus.New()
+var fileLog = logrus.New()
+
+// Initialize logger from file path
+func initLogger(filePath string) {
+	os.MkdirAll(path.Dir(filePath), os.ModePerm)
+	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY, 0666)
+
+	if err == nil {
+		fileLog.Out = file
+	}
+}
 
 type Logger struct {
 	LogLine        func(format string, a ...interface{})
@@ -34,10 +51,12 @@ type Logger struct {
 // Create default implementation of logger
 var defaultLogger = Logger{
 	LogLine: func(format string, a ...interface{}) {
-		log.Printf(format+"\n", a...)
+		consoleLog.Printf(format, a...)
+		fileLog.Printf(format, a...)
 	},
 	UpdateProgress: func(progress int) {
-		log.Printf("Progress is %d%%\n", progress)
+		consoleLog.Printf("Progress is %d%%", progress)
+		fileLog.Printf("Progress is %d%%", progress)
 	},
 }
 

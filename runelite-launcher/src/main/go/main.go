@@ -71,6 +71,9 @@ func main() {
 	runeliteHome := path.Join(home, ".runelite")
 	launcherCache := path.Join(runeliteHome, "cache")
 	distributionCache := path.Join(launcherCache, "RuneLite")
+	logDir := path.Join(runeliteHome, "logs")
+	logFilePath := path.Join(logDir, "launcher.log")
+	initLogger(logFilePath)
 
 	// Execute command and pass arguments passed to application to it
 	run := func(path string) error {
@@ -210,7 +213,7 @@ func main() {
 				break
 			}
 
-			logger.LogLine("Unexpected error occurred: %s", err)
+			logger.LogLine("Unexpected error occurred: %v", err)
 
 			if i == maxRetries {
 				panic(err)

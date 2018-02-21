@@ -291,6 +291,7 @@
                                 <package>github.com/cavaliercoder/grab</package>
                                 <package>github.com/aarzilli/nucular</package>
                                 <package>github.com/blang/semver</package>
+                                <package>github.com/sirupsen/logrus</package>
                             </packages>
                         </configuration>
                     </execution>
