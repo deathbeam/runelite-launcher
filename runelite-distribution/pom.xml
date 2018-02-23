@@ -125,14 +125,9 @@
                                 <argument>--output</argument>
                                 <argument>${project.build.directory}/distribution/linux32</argument>
                                 <argument>--vmargs</argument>
-                                <argument>Xmx512m</argument>
-                                <argument>Xms2m</argument>
-                                <argument>Dsun.java2d.noddraw=true</argument>
-                                <argument>XX:CompileThreshold=1500</argument>
-                                <argument>Xincgc</argument>
-                                <argument>XX:+UseConcMarkSweepGC</argument>
-                                <argument>XX:+UseParNewGC</argument>
+                                <argument>Dsun.java2d.noddraw=false</argument>
                                 <argument>Djna.nosys=true</argument>
+                                <argument>XX:+UseG1GC</argument>
                             </arguments>
                         </configuration>
                     </execution>
@@ -162,14 +157,9 @@
                                 <argument>--output</argument>
                                 <argument>${project.build.directory}/distribution/linux64</argument>
                                 <argument>--vmargs</argument>
-                                <argument>Xmx512m</argument>
-                                <argument>Xms2m</argument>
-                                <argument>Dsun.java2d.noddraw=true</argument>
-                                <argument>XX:CompileThreshold=1500</argument>
-                                <argument>Xincgc</argument>
-                                <argument>XX:+UseConcMarkSweepGC</argument>
-                                <argument>XX:+UseParNewGC</argument>
+                                <argument>Dsun.java2d.noddraw=false</argument>
                                 <argument>Djna.nosys=true</argument>
+                                <argument>XX:+UseG1GC</argument>
                             </arguments>
                         </configuration>
                     </execution>
@@ -199,14 +189,9 @@
                                 <argument>--output</argument>
                                 <argument>${project.build.directory}/distribution/windows32</argument>
                                 <argument>--vmargs</argument>
-                                <argument>Xmx512m</argument>
-                                <argument>Xms2m</argument>
-                                <argument>Dsun.java2d.noddraw=true</argument>
-                                <argument>XX:CompileThreshold=1500</argument>
-                                <argument>Xincgc</argument>
-                                <argument>XX:+UseConcMarkSweepGC</argument>
-                                <argument>XX:+UseParNewGC</argument>
+                                <argument>Dsun.java2d.noddraw=false</argument>
                                 <argument>Djna.nosys=true</argument>
+                                <argument>XX:+UseG1GC</argument>
                             </arguments>
                         </configuration>
                     </execution>
@@ -236,14 +221,9 @@
                                 <argument>--output</argument>
                                 <argument>${project.build.directory}/distribution/windows64</argument>
                                 <argument>--vmargs</argument>
-                                <argument>Xmx512m</argument>
-                                <argument>Xms2m</argument>
-                                <argument>Dsun.java2d.noddraw=true</argument>
-                                <argument>XX:CompileThreshold=1500</argument>
-                                <argument>Xincgc</argument>
-                                <argument>XX:+UseConcMarkSweepGC</argument>
-                                <argument>XX:+UseParNewGC</argument>
+                                <argument>Dsun.java2d.noddraw=false</argument>
                                 <argument>Djna.nosys=true</argument>
+                                <argument>XX:+UseG1GC</argument>
                             </arguments>
                         </configuration>
                     </execution>
@@ -275,14 +255,9 @@
                                 <argument>--output</argument>
                                 <argument>${project.build.directory}/distribution/darwin</argument>
                                 <argument>--vmargs</argument>
-                                <argument>Xmx512m</argument>
-                                <argument>Xms2m</argument>
-                                <argument>Dsun.java2d.noddraw=true</argument>
-                                <argument>XX:CompileThreshold=1500</argument>
-                                <argument>Xincgc</argument>
-                                <argument>XX:+UseConcMarkSweepGC</argument>
-                                <argument>XX:+UseParNewGC</argument>
+                                <argument>Dsun.java2d.noddraw=false</argument>
                                 <argument>Djna.nosys=true</argument>
+                                <argument>XX:+UseG1GC</argument>
                             </arguments>
                         </configuration>
                     </execution>
