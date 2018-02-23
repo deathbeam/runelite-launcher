@@ -5,6 +5,7 @@
 
 ;--------------------------------
 ;Defines
+
   !define PROJECT_FILE "${project.artifactId}-windows-4.0-386.exe"
   !define PROJECT_NAME "${project.name}"
   !define PROJECT_INSTALLER "${project.installerName}"
@@ -49,18 +50,20 @@
   !insertmacro MUI_LANGUAGE "English"
 
 ;--------------------------------
-;Installer Sections
+;Installer Section
 
 Section "Install"
 
+  ;Set path to where files will be installed
   SetOutPath "$INSTDIR"
 
+  ;Install the executable
   File "%${PROJECT_FILE}"
 
-  ; Create desktop shortcut
+  ;Create desktop shortcut
   CreateShortCut "$DESKTOP\%${PROJECT_NAME}.lnk" "$INSTDIR\%${PROJECT_FILE}" ""
 
-  ; Create start-menu items
+  ;Create start-menu items
   CreateDirectory "$SMPROGRAMS\%${PROJECT_NAME}"
   CreateShortCut "$SMPROGRAMS\%${PROJECT_NAME}\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\Uninstall.exe" 0
   CreateShortCut "$SMPROGRAMS\%${PROJECT_NAME}\%${PROJECT_NAME}.lnk" "$INSTDIR\%${PROJECT_FILE}" "" "$INSTDIR\%${PROJECT_FILE}" 0
@@ -79,13 +82,11 @@ SectionEnd
 
 Section "Uninstall"
 
-  ; Delete Files
-  RMDir /r "$INSTDIR\*.*"
+  ;Delete Files
+  Delete "$INSTDIR\%${PROJECT_FILE}"
+  Delete "$INSTDIR\Uninstall.exe"
 
-  ; Remove the installation directory
-  RMDir "$INSTDIR"
-
-  ; Delete shortcuts
+  ;Delete shortcuts
   Delete "$DESKTOP\%${PROJECT_NAME}.lnk"
   Delete "$SMPROGRAMS\%${PROJECT_NAME}\*.*"
   RmDir  "$SMPROGRAMS\%${PROJECT_NAME}"
